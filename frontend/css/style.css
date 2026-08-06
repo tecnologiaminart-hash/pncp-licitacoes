@@ -442,7 +442,9 @@ body {
   color: var(--cor-primaria-escura);
 }
 
-.chip--data {
+.chip--data,
+.chip--data-inicio,
+.chip--data-fim {
   background: #eceff3;
   color: var(--cor-texto-secundario);
 }

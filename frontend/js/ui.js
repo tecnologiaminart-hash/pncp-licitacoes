@@ -25,6 +25,9 @@ const Ui = (() => {
   const templateCard = document.getElementById('templateCardLicitacao');
 
   const formatadorData = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const formatadorDataHora = new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
 
   function preencherUfs() {
     UFS.forEach((uf) => {
@@ -163,6 +166,13 @@ const Ui = (() => {
     return formatadorData.format(data);
   }
 
+  function formatarDataHora(isoString) {
+    if (!isoString) return 'Não informado';
+    const data = new Date(isoString);
+    if (Number.isNaN(data.getTime())) return 'Não informado';
+    return formatadorDataHora.format(data);
+  }
+
   function criarCard(licitacao) {
     const fragmento = templateCard.content.cloneNode(true);
     const artigo = fragmento.querySelector('.licitacao-card');
@@ -173,7 +183,9 @@ const Ui = (() => {
     fragmento.querySelector('.licitacao-card__local').textContent =
       `${licitacao.municipio || 'Município não informado'} — ${licitacao.uf || 'UF não informada'}`;
     fragmento.querySelector('.licitacao-card__objeto').textContent = licitacao.objetoResumido;
-    fragmento.querySelector('.chip--data').textContent = formatarData(licitacao.dataPublicacao);
+    fragmento.querySelector('.chip--data').textContent = `Publicação: ${formatarData(licitacao.dataPublicacao)}`;
+    fragmento.querySelector('.chip--data-inicio').textContent = `Início: ${formatarDataHora(licitacao.dataInicioVigencia)}`;
+    fragmento.querySelector('.chip--data-fim').textContent = `Fim: ${formatarDataHora(licitacao.dataFimVigencia)}`;
     fragmento.querySelector('.chip--palavra').textContent = `#${licitacao.palavraChave}`;
 
     const infoSituacao = SITUACAO_INFO[licitacao.situacao];
