@@ -10,14 +10,11 @@ const UFS = [
 
 // Todas iniciam marcadas; o usuário pode desmarcar qualquer uma antes de pesquisar.
 const PALAVRAS_CHAVE_PADRAO = [
-  'merenda escolar',
-  'medicamentos',
-  'material de limpeza',
-  'construção civil',
-  'informática',
-  'combustível',
-  'equipamentos hospitalares',
-  'manutenção de veículos',
-  'segurança e vigilância',
-  'obras públicas',
+  'Mobiliário',
+  'Móveis',
+  'Móveis escolares',
+  'Móveis de escritório',
+  'Conjunto CJA',
+  'Mesas',
+  'Cadeiras',
 ];

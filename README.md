@@ -108,7 +108,7 @@ GET /api/licitacoes
 
 | Parâmetro       | Obrigatório | Descrição                                              |
 |-----------------|:-----------:|----------------------------------------------------------|
-| `palavrasChave`  | sim         | Lista separada por vírgula (ex.: `medicamentos,combustível`) |
+| `palavrasChave`  | sim         | Lista separada por vírgula (ex.: `Mesas,Cadeiras`) |
 | `uf`             | não         | Sigla do estado (ex.: `SP`)                              |
 | `dataInicial`    | não         | `AAAA-MM-DD`                                              |
 | `dataFinal`      | não         | `AAAA-MM-DD`                                               |
@@ -126,14 +126,14 @@ Exemplo de resposta:
   "resultados": [
     {
       "id": "07954480000179-1-020079/2026",
-      "titulo": "Aviso de Contratação Direta nº 202624275/2026",
+      "titulo": "Pregão Eletrônico nº 202624275/2026",
       "orgao": "ESTADO DO CEARA",
       "uf": "CE",
       "municipio": "Itapiúna",
       "dataPublicacao": "2026-07-31T08:13:30.128413",
-      "modalidade": "Dispensa",
-      "objetoResumido": "AQUISIÇÃO DE GÊNEROS ALIMENTICIOS PARA ALIMENTAÇÃO ESCOLAR...",
-      "palavraChave": "merenda escolar",
+      "modalidade": "Pregão - Eletrônico",
+      "objetoResumido": "AQUISIÇÃO DE MOBILIÁRIO ESCOLAR (MESAS E CADEIRAS) PARA...",
+      "palavraChave": "Mesas",
       "linkPncp": "https://pncp.gov.br/app/compras/07954480000179/2026/20079"
     }
   ],
