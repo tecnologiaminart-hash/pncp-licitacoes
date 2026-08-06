@@ -11,6 +11,8 @@
   <!-- Tela de login: visível quando não há sessão ativa. O app-shell abaixo fica escondido até autenticar. -->
   <div id="telaLogin" class="tela-login">
     <form id="formLogin" class="card login-card">
+      <img src="assets/logo-minart.png" alt="Minart Móveis" class="login-card__logo" />
+
       <div class="campo">
         <label for="loginEmail">E-mail</label>
         <input type="email" id="loginEmail" required autocomplete="username" />
@@ -30,8 +32,7 @@
   <div id="appShell" class="app-shell" hidden>
     <nav class="sidebar">
       <div class="sidebar__topo">
-        <span class="sidebar__logo" aria-hidden="true">📄</span>
-        <span class="sidebar__titulo">Licitações PNCP</span>
+        <img src="assets/logo-minart.png" alt="Minart Móveis" class="sidebar__logo-img" />
       </div>
 
       <ul class="sidebar__abas">

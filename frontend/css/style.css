@@ -71,6 +71,14 @@ body {
   justify-content: center;
 }
 
+.login-card__logo {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  margin: 0 auto 8px;
+}
+
 /* ==========================================================================
    App shell (sidebar + conteúdo)
    ========================================================================== */
@@ -95,17 +103,14 @@ body {
 .sidebar__topo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   padding: 0 8px 20px;
 }
 
-.sidebar__logo {
-  font-size: 1.4rem;
-}
-
-.sidebar__titulo {
-  font-weight: 600;
-  font-size: 1rem;
+.sidebar__logo-img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
 }
 
 .sidebar__abas {
@@ -756,8 +761,8 @@ body {
     padding: 0 8px;
   }
 
-  .sidebar__titulo {
-    display: none;
+  .sidebar__logo-img {
+    max-width: 100px;
   }
 
   .sidebar__abas {
