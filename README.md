@@ -160,6 +160,29 @@ instabilidade etc.), permitindo exibir os demais resultados normalmente com um a
 - Paginação dos resultados.
 - Layout responsivo (grid adaptável, mobile-first nos breakpoints principais).
 
+## Deploy gratuito (Render)
+
+O GitHub por si só não executa o backend (só hospeda o código). Este projeto inclui
+um `render.yaml` na raiz para subir o backend gratuitamente no [Render](https://render.com),
+que serve tanto a API quanto o frontend estático a partir do mesmo serviço Node.
+
+Passo a passo:
+
+1. Crie uma conta em https://render.com e conecte sua conta do GitHub.
+2. No painel do Render, clique em **New +** → **Blueprint**.
+3. Selecione o repositório `pncp-licitacoes`. O Render vai detectar o `render.yaml`
+   automaticamente e propor a criação do serviço `pncp-licitacoes` (plano `free`).
+4. Confirme a criação. O Render já builda (`npm install`) e sobe (`npm start`)
+   sozinho a cada novo `git push` na branch principal.
+5. Ao final, você recebe uma URL pública do tipo `https://pncp-licitacoes.onrender.com`.
+
+Observações do plano gratuito do Render: o serviço "dorme" após um período sem uso e
+demora alguns segundos para acordar na primeira requisição seguinte — normal do free tier.
+
+Se preferir outro provedor (Railway, Fly.io, um VPS, etc.), qualquer um que rode
+Node.js 18+ funciona: basta configurar `rootDir`/diretório de trabalho como `backend/`,
+comando de build `npm install` e comando de start `npm start`.
+
 ## Notas técnicas
 
 - Sem frameworks no frontend: HTML + CSS + JavaScript puro (sem build step).

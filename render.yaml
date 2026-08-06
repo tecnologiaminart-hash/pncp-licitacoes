@@ -1,0 +1,24 @@
+# Blueprint do Render (https://render.com) — permite subir o backend com um clique
+# via "New +" > "Blueprint" apontando para este repositório.
+# O Render define PORT automaticamente; o app já lê process.env.PORT (backend/src/config/env.js).
+services:
+  - type: web
+    name: pncp-licitacoes
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PNCP_SEARCH_URL
+        value: https://pncp.gov.br/api/search/
+      - key: PNCP_APP_URL
+        value: https://pncp.gov.br/app
+      - key: PNCP_TIMEOUT_MS
+        value: "15000"
+      - key: PNCP_MAX_PAGES_POR_PALAVRA
+        value: "3"
+      - key: PNCP_TAMANHO_PAGINA_UPSTREAM
+        value: "50"
+      - key: CACHE_TTL_SEGUNDOS
+        value: "300"
