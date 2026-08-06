@@ -108,8 +108,11 @@ GET /api/licitacoes
 
 | Parâmetro       | Obrigatório | Descrição                                              |
 |-----------------|:-----------:|----------------------------------------------------------|
-| `palavrasChave`  | sim         | Lista separada por vírgula (ex.: `Mesas,Cadeiras`) |
+| `palavrasChave`  | sim         | Lista separada por vírgula. Aceita qualquer termo, não só os sugeridos (ex.: `Mesas,Cadeiras,ventilador industrial`) |
 | `uf`             | não         | Sigla do estado (ex.: `SP`)                              |
+| `modalidade`     | não         | Uma das modalidades da tabela de domínio do PNCP (ex.: `Pregão - Eletrônico`) |
+| `orgao`          | não         | Busca parcial e tolerante a acentos no nome do órgão (ex.: `saude` encontra "SAÚDE") |
+| `ordenacao`      | não         | `data_desc` (padrão), `data_asc`, `titulo_asc`, `titulo_desc`, `orgao_asc`, `orgao_desc` |
 | `dataInicial`    | não         | `AAAA-MM-DD`                                              |
 | `dataFinal`      | não         | `AAAA-MM-DD`                                               |
 | `pagina`         | não         | Padrão `1`                                                 |
@@ -134,7 +137,7 @@ Exemplo de resposta:
       "modalidade": "Pregão - Eletrônico",
       "objetoResumido": "AQUISIÇÃO DE MOBILIÁRIO ESCOLAR (MESAS E CADEIRAS) PARA...",
       "palavraChave": "Mesas",
-      "linkPncp": "https://pncp.gov.br/app/compras/07954480000179/2026/20079"
+      "linkPncp": "https://pncp.gov.br/app/editais/07954480000179/2026/20079"
     }
   ],
   "keywordsComErro": []
@@ -146,10 +149,15 @@ instabilidade etc.), permitindo exibir os demais resultados normalmente com um a
 
 ## Funcionalidades do frontend
 
-- Filtro por Estado (UF) e por período (data inicial/final).
-- Lista de palavras-chave pré-selecionadas em checkbox, todas marcadas por padrão
-  e desmarcáveis livremente.
-- Botão **Pesquisar** que envia apenas as palavras-chave marcadas.
+- Filtro por Estado (UF), Modalidade da contratação, Órgão (busca parcial) e
+  por período (data inicial/final).
+- Ordenação dos resultados (mais recentes/antigas primeiro, título A-Z/Z-A,
+  órgão A-Z/Z-A).
+- Lista de palavras-chave pré-selecionadas em checkbox, todas marcadas por padrão.
+  Cada uma pode ser desmarcada (não participa da busca) ou **removida** por completo
+  (botão "×" no chip), e o usuário pode **adicionar** quantas palavras-chave próprias
+  quiser pelo campo de texto abaixo da lista.
+- Botão **Pesquisar** que envia apenas as palavras-chave marcadas no momento.
 - Cartões de resultado (estilo Material Design) exibindo título, órgão, estado,
   município, data de publicação, modalidade, objeto resumido e a palavra-chave
   que gerou o resultado.

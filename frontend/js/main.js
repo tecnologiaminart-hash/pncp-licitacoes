@@ -10,6 +10,9 @@
   function montarFiltros(pagina) {
     return {
       uf: Ui.elUf.value,
+      modalidade: Ui.elModalidade.value,
+      orgao: Ui.elOrgao.value.trim(),
+      ordenacao: Ui.elOrdenacao.value,
       dataInicial: elDataInicial.value,
       dataFinal: elDataFinal.value,
       palavrasChave: Ui.obterPalavrasChaveSelecionadas(),
@@ -20,7 +23,7 @@
 
   function validarFiltrosLocalmente(filtros) {
     if (filtros.palavrasChave.length === 0) {
-      return 'Selecione ao menos uma palavra-chave para pesquisar.';
+      return 'Selecione ou adicione ao menos uma palavra-chave para pesquisar.';
     }
     if (filtros.dataInicial && filtros.dataFinal && filtros.dataInicial > filtros.dataFinal) {
       return 'A data inicial não pode ser posterior à data final.';
@@ -51,10 +54,32 @@
     }
   }
 
+  /** Lê o campo de nova palavra-chave, adiciona à lista (se válida) e limpa o campo. */
+  function adicionarNovaPalavraChaveDoInput() {
+    const valor = Ui.elNovaPalavraChave.value;
+    if (!valor.trim()) return;
+
+    const adicionou = Ui.adicionarPalavraChave(valor);
+    Ui.mostrarMensagemValidacao(adicionou ? '' : 'Essa palavra-chave já está na lista.');
+    Ui.elNovaPalavraChave.value = '';
+    Ui.elNovaPalavraChave.focus();
+  }
+
   function inicializar() {
     Ui.preencherUfs();
+    Ui.preencherModalidades();
+    Ui.preencherOrdenacao();
     Ui.preencherPalavrasChave();
+
     elBtnPesquisar.addEventListener('click', () => executarBusca(1));
+
+    Ui.elBtnAdicionarPalavraChave.addEventListener('click', adicionarNovaPalavraChaveDoInput);
+    Ui.elNovaPalavraChave.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Enter') {
+        evento.preventDefault();
+        adicionarNovaPalavraChaveDoInput();
+      }
+    });
   }
 
   document.addEventListener('DOMContentLoaded', inicializar);

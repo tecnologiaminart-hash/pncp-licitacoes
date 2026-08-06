@@ -1,6 +1,5 @@
-// Configuração estática do frontend: UFs disponíveis e palavras-chave pré-selecionadas.
-// Mantida em espelho com backend/src/config/constants.js — qualquer alteração de uma
-// lista deve ser refletida na outra, já que o backend valida as palavras-chave recebidas.
+// Configuração estática do frontend: UFs, modalidades, opções de ordenação e
+// palavras-chave pré-selecionadas. Mantida em espelho com backend/src/config/constants.js.
 
 const UFS = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
@@ -8,7 +7,33 @@ const UFS = [
   'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ];
 
-// Todas iniciam marcadas; o usuário pode desmarcar qualquer uma antes de pesquisar.
+const MODALIDADES_CONTRATACAO = [
+  'Leilão - Eletrônico',
+  'Leilão - Presencial',
+  'Diálogo Competitivo',
+  'Concurso',
+  'Concorrência - Eletrônica',
+  'Concorrência - Presencial',
+  'Pregão - Eletrônico',
+  'Pregão - Presencial',
+  'Dispensa',
+  'Inexigibilidade',
+  'Manifestação de Interesse',
+  'Pré-qualificação',
+  'Credenciamento',
+];
+
+// value = valor enviado à API; label = texto exibido no <select>.
+const OPCOES_ORDENACAO = [
+  { value: 'data_desc', label: 'Mais recentes primeiro' },
+  { value: 'data_asc', label: 'Mais antigas primeiro' },
+  { value: 'titulo_asc', label: 'Título (A-Z)' },
+  { value: 'titulo_desc', label: 'Título (Z-A)' },
+  { value: 'orgao_asc', label: 'Órgão (A-Z)' },
+  { value: 'orgao_desc', label: 'Órgão (Z-A)' },
+];
+
+// Sugestões iniciais; o usuário pode remover qualquer uma e adicionar termos próprios.
 const PALAVRAS_CHAVE_PADRAO = [
   'Mobiliário',
   'Móveis',

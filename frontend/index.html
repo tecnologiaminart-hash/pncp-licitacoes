@@ -26,6 +26,18 @@
         </div>
 
         <div class="campo">
+          <label for="modalidade">Modalidade da contratação</label>
+          <select id="modalidade" name="modalidade">
+            <option value="">Todas as modalidades</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="orgao">Órgão</label>
+          <input type="text" id="orgao" name="orgao" placeholder="Ex.: Secretaria de Educação" />
+        </div>
+
+        <div class="campo">
           <label for="dataInicial">Data inicial</label>
           <input type="date" id="dataInicial" name="dataInicial" />
         </div>
@@ -34,12 +46,28 @@
           <label for="dataFinal">Data final</label>
           <input type="date" id="dataFinal" name="dataFinal" />
         </div>
+
+        <div class="campo">
+          <label for="ordenacao">Ordenar por</label>
+          <select id="ordenacao" name="ordenacao">
+            <!-- Opções preenchidas dinamicamente via js/keywords.js -->
+          </select>
+        </div>
       </div>
 
       <fieldset class="palavras-chave">
         <legend>Palavras-chave</legend>
         <div id="listaPalavrasChave" class="palavras-chave__lista">
-          <!-- Checkboxes preenchidos dinamicamente via js/keywords.js -->
+          <!-- Chips preenchidos dinamicamente via js/keywords.js -->
+        </div>
+        <div class="palavras-chave__adicionar">
+          <input
+            type="text"
+            id="novaPalavraChave"
+            placeholder="Adicionar palavra-chave e pressionar Enter"
+            maxlength="80"
+          />
+          <button id="btnAdicionarPalavraChave" class="botao botao--texto" type="button">+ Adicionar</button>
         </div>
       </fieldset>
 

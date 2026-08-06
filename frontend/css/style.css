@@ -173,6 +173,56 @@ body {
   cursor: pointer;
 }
 
+.chip-palavra__remover {
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0 0 2px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transicao), color var(--transicao);
+}
+
+.chip-palavra__remover:hover {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro);
+}
+
+.palavras-chave__adicionar {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  max-width: 420px;
+}
+
+.palavras-chave__adicionar input {
+  flex: 1;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-pequeno);
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+}
+
+.palavras-chave__adicionar input:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+}
+
+.palavras-chave__adicionar .botao {
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+
 .filtros__acoes {
   display: flex;
   align-items: center;

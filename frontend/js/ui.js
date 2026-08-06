@@ -4,7 +4,12 @@
 
 const Ui = (() => {
   const elUf = document.getElementById('uf');
+  const elModalidade = document.getElementById('modalidade');
+  const elOrgao = document.getElementById('orgao');
+  const elOrdenacao = document.getElementById('ordenacao');
   const elListaPalavras = document.getElementById('listaPalavrasChave');
+  const elNovaPalavraChave = document.getElementById('novaPalavraChave');
+  const elBtnAdicionarPalavraChave = document.getElementById('btnAdicionarPalavraChave');
   const elMensagemValidacao = document.getElementById('mensagemValidacao');
   const elBtnPesquisar = document.getElementById('btnPesquisar');
   const elLoading = document.getElementById('loading');
@@ -29,25 +34,71 @@ const Ui = (() => {
     });
   }
 
-  function preencherPalavrasChave() {
-    PALAVRAS_CHAVE_PADRAO.forEach((palavra, indice) => {
-      const id = `palavra-${indice}`;
-      const label = document.createElement('label');
-      label.className = 'checkbox-palavra';
-      label.setAttribute('for', id);
-
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.id = id;
-      input.value = palavra;
-      input.checked = true; // todas pré-selecionadas; o usuário pode desmarcar
-
-      const span = document.createElement('span');
-      span.textContent = palavra;
-
-      label.append(input, span);
-      elListaPalavras.appendChild(label);
+  function preencherModalidades() {
+    MODALIDADES_CONTRATACAO.forEach((modalidade) => {
+      const option = document.createElement('option');
+      option.value = modalidade;
+      option.textContent = modalidade;
+      elModalidade.appendChild(option);
     });
+  }
+
+  function preencherOrdenacao() {
+    OPCOES_ORDENACAO.forEach(({ value, label }) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = label;
+      elOrdenacao.appendChild(option);
+    });
+  }
+
+  /** Verifica (sem diferenciar maiúsc./minúsc.) se a palavra já está na lista atual. */
+  function existePalavraChave(palavra) {
+    const alvo = palavra.trim().toLowerCase();
+    return Array.from(elListaPalavras.children).some(
+      (chip) => chip.dataset.valor.toLowerCase() === alvo,
+    );
+  }
+
+  function criarChipPalavra(palavra) {
+    const chip = document.createElement('label');
+    chip.className = 'checkbox-palavra chip-palavra';
+    chip.dataset.valor = palavra;
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.value = palavra;
+    input.checked = true; // toda palavra nova entra marcada; o usuário pode desmarcar
+
+    const span = document.createElement('span');
+    span.textContent = palavra;
+
+    const btnRemover = document.createElement('button');
+    btnRemover.type = 'button';
+    btnRemover.className = 'chip-palavra__remover';
+    btnRemover.textContent = '×';
+    btnRemover.setAttribute('aria-label', `Remover palavra-chave ${palavra}`);
+    // Impede que o clique no "×" também acione o toggle do checkbox do <label> pai.
+    btnRemover.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+      chip.remove();
+    });
+
+    chip.append(input, span, btnRemover);
+    return chip;
+  }
+
+  /** Adiciona uma nova palavra-chave à lista (ignora vazias e duplicadas). Retorna true se adicionou. */
+  function adicionarPalavraChave(palavraBruta) {
+    const palavra = palavraBruta.trim();
+    if (!palavra || existePalavraChave(palavra)) return false;
+    elListaPalavras.appendChild(criarChipPalavra(palavra));
+    return true;
+  }
+
+  function preencherPalavrasChave() {
+    PALAVRAS_CHAVE_PADRAO.forEach((palavra) => adicionarPalavraChave(palavra));
   }
 
   function obterPalavrasChaveSelecionadas() {
@@ -173,8 +224,16 @@ const Ui = (() => {
 
   return {
     elUf,
+    elModalidade,
+    elOrgao,
+    elOrdenacao,
+    elNovaPalavraChave,
+    elBtnAdicionarPalavraChave,
     preencherUfs,
+    preencherModalidades,
+    preencherOrdenacao,
     preencherPalavrasChave,
+    adicionarPalavraChave,
     obterPalavrasChaveSelecionadas,
     mostrarMensagemValidacao,
     alternarLoading,

@@ -3,6 +3,7 @@
 const { buscarPorPalavraChave } = require('./pncpClient');
 const { normalizarLicitacao } = require('../utils/normalize');
 const { cache, montarChaveCache } = require('../utils/cache');
+const { contemTexto } = require('../utils/texto');
 const { pncpMaxPaginasPorPalavra, pncpTamanhoPaginaUpstream } = require('../config/env');
 
 /**
@@ -22,14 +23,16 @@ async function buscarTodasPaginasDaPalavra(palavraChave) {
 }
 
 /**
- * Aplica os filtros de Estado (UF) e período sobre a lista já normalizada.
+ * Aplica os filtros de Estado (UF), modalidade, órgão e período sobre a lista já normalizada.
  * Esses filtros são aplicados aqui no backend (e não repassados à API do PNCP) porque
  * o endpoint de busca do PNCP não garante, de forma confiável, o filtro server-side
- * por UF/data — então filtramos localmente sobre o conjunto de resultados obtido.
+ * por UF/data/modalidade — então filtramos localmente sobre o conjunto de resultados obtido.
  */
-function aplicarFiltros(licitacoes, { uf, dataInicial, dataFinal }) {
+function aplicarFiltros(licitacoes, { uf, modalidade, orgao, dataInicial, dataFinal }) {
   return licitacoes.filter((licitacao) => {
     if (uf && licitacao.uf !== uf) return false;
+    if (modalidade && licitacao.modalidade !== modalidade) return false;
+    if (orgao && !contemTexto(licitacao.orgao, orgao)) return false;
 
     if ((dataInicial || dataFinal) && licitacao.dataPublicacao) {
       const dataPub = licitacao.dataPublicacao.slice(0, 10); // "AAAA-MM-DD"
@@ -39,6 +42,24 @@ function aplicarFiltros(licitacoes, { uf, dataInicial, dataFinal }) {
 
     return true;
   });
+}
+
+/**
+ * Ordena a lista já filtrada de acordo com a opção escolhida pelo usuário.
+ * Aplicada em memória, fora do cache, para não precisar de uma entrada de
+ * cache por combinação de ordenação (o custo de ordenar é desprezível).
+ */
+function ordenarLicitacoes(licitacoes, ordenacao) {
+  const comparadores = {
+    data_desc: (a, b) => (b.dataPublicacao || '').localeCompare(a.dataPublicacao || ''),
+    data_asc: (a, b) => (a.dataPublicacao || '').localeCompare(b.dataPublicacao || ''),
+    titulo_asc: (a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'),
+    titulo_desc: (a, b) => b.titulo.localeCompare(a.titulo, 'pt-BR'),
+    orgao_asc: (a, b) => a.orgao.localeCompare(b.orgao, 'pt-BR'),
+    orgao_desc: (a, b) => b.orgao.localeCompare(a.orgao, 'pt-BR'),
+  };
+  const comparador = comparadores[ordenacao] || comparadores.data_desc;
+  return [...licitacoes].sort(comparador);
 }
 
 /** Remove licitações duplicadas (mesma licitação encontrada por palavras-chave diferentes). */
@@ -86,7 +107,6 @@ async function obterConjuntoFiltrado(filtros) {
 
   const unicas = removerDuplicadas(licitacoes);
   const filtradas = aplicarFiltros(unicas, filtros);
-  filtradas.sort((a, b) => (b.dataPublicacao || '').localeCompare(a.dataPublicacao || ''));
 
   const conjunto = { licitacoes: filtradas, keywordsComErro };
   cache.set(chaveCache, conjunto);
@@ -98,12 +118,13 @@ async function obterConjuntoFiltrado(filtros) {
  */
 async function buscarLicitacoes(filtros) {
   const { licitacoes, keywordsComErro } = await obterConjuntoFiltrado(filtros);
+  const ordenadas = ordenarLicitacoes(licitacoes, filtros.ordenacao);
 
-  const totalRegistros = licitacoes.length;
+  const totalRegistros = ordenadas.length;
   const totalPaginas = Math.max(1, Math.ceil(totalRegistros / filtros.tamanhoPagina));
   const paginaAtual = Math.min(filtros.pagina, totalPaginas);
   const inicio = (paginaAtual - 1) * filtros.tamanhoPagina;
-  const resultados = licitacoes.slice(inicio, inicio + filtros.tamanhoPagina);
+  const resultados = ordenadas.slice(inicio, inicio + filtros.tamanhoPagina);
 
   return {
     pagina: paginaAtual,
