@@ -3,144 +3,214 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Busca de Licitações — PNCP</title>
+  <title>Pipeline de Licitações — PNCP</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <header class="app-bar">
-    <div class="app-bar__content">
-      <span class="app-bar__logo" aria-hidden="true">📄</span>
-      <h1 class="app-bar__title">Busca de Licitações — PNCP</h1>
-    </div>
-  </header>
 
-  <main class="container">
-    <!-- Painel de filtros -->
-    <section class="card filtros" aria-label="Filtros de busca">
-      <div class="filtros__grid">
-        <div class="campo">
-          <label for="uf">Estado (UF)</label>
-          <select id="uf" name="uf">
-            <option value="">Todos os estados</option>
-          </select>
-        </div>
+  <!-- Tela de login: visível quando não há sessão ativa. O app-shell abaixo fica escondido até autenticar. -->
+  <div id="telaLogin" class="tela-login">
+    <form id="formLogin" class="card login-card">
+      <h1 class="login-card__titulo"><span aria-hidden="true">📄</span> Pipeline de Licitações</h1>
+      <p class="login-card__subtitulo">Entre com sua conta para continuar.</p>
 
-        <div class="campo">
-          <label for="modalidade">Modalidade da contratação</label>
-          <select id="modalidade" name="modalidade">
-            <option value="">Todas as modalidades</option>
-          </select>
-        </div>
-
-        <div class="campo">
-          <label for="orgao">Órgão</label>
-          <input type="text" id="orgao" name="orgao" placeholder="Ex.: Secretaria de Educação" />
-        </div>
-
-        <div class="campo">
-          <label for="dataInicial">Data inicial</label>
-          <input type="date" id="dataInicial" name="dataInicial" />
-        </div>
-
-        <div class="campo">
-          <label for="dataFinal">Data final</label>
-          <input type="date" id="dataFinal" name="dataFinal" />
-        </div>
-
-        <div class="campo">
-          <label for="ordenacao">Ordenar por</label>
-          <select id="ordenacao" name="ordenacao">
-            <!-- Opções preenchidas dinamicamente via js/keywords.js -->
-          </select>
-        </div>
+      <div class="campo">
+        <label for="loginEmail">E-mail</label>
+        <input type="email" id="loginEmail" required autocomplete="username" />
+      </div>
+      <div class="campo">
+        <label for="loginSenha">Senha</label>
+        <input type="password" id="loginSenha" required autocomplete="current-password" />
       </div>
 
-      <fieldset class="palavras-chave">
-        <legend>Situação</legend>
-        <div id="listaSituacoes" class="palavras-chave__lista">
-          <!-- Checkboxes preenchidos dinamicamente via js/keywords.js -->
-        </div>
-      </fieldset>
+      <span id="loginErro" class="mensagem-validacao" role="alert"></span>
 
-      <fieldset class="palavras-chave">
-        <legend>Palavras-chave</legend>
-        <div id="listaPalavrasChave" class="palavras-chave__lista">
-          <!-- Chips preenchidos dinamicamente via js/keywords.js -->
-        </div>
-        <div class="palavras-chave__adicionar">
-          <input
-            type="text"
-            id="novaPalavraChave"
-            placeholder="Adicionar palavra-chave e pressionar Enter"
-            maxlength="80"
-          />
-          <button id="btnAdicionarPalavraChave" class="botao botao--texto" type="button">+ Adicionar</button>
-        </div>
-      </fieldset>
+      <button type="submit" id="btnLogin" class="botao botao--primario login-card__botao">Entrar</button>
+    </form>
+  </div>
 
-      <div class="filtros__acoes">
-        <span id="mensagemValidacao" class="mensagem-validacao" role="alert"></span>
-        <button id="btnPesquisar" class="botao botao--primario" type="button">
-          <span class="botao__icone" aria-hidden="true">🔍</span>
-          Pesquisar
-        </button>
+  <!-- App principal: visível só depois de autenticado (ver js/shell.js). -->
+  <div id="appShell" class="app-shell" hidden>
+    <nav class="sidebar">
+      <div class="sidebar__topo">
+        <span class="sidebar__logo" aria-hidden="true">📄</span>
+        <span class="sidebar__titulo">Licitações PNCP</span>
       </div>
-    </section>
 
-    <!-- Estado de carregamento -->
-    <div id="loading" class="loading" hidden>
-      <div class="spinner" aria-hidden="true"></div>
-      <p>Consultando o PNCP, aguarde...</p>
-    </div>
+      <ul class="sidebar__abas">
+        <li><button class="sidebar__aba" data-aba="buscar" type="button"><span aria-hidden="true">🔍</span> Buscar Licitações</button></li>
+        <li><button class="sidebar__aba" data-aba="em-analise" type="button"><span aria-hidden="true">🗂️</span> Em análise</button></li>
+        <li><button class="sidebar__aba" data-aba="propostas" type="button"><span aria-hidden="true">📄</span> Propostas enviadas</button></li>
+        <li><button class="sidebar__aba" data-aba="contratos" type="button"><span aria-hidden="true">🏆</span> Contratos ganhos</button></li>
+        <li><button class="sidebar__aba" data-aba="arquivadas" type="button"><span aria-hidden="true">🗄️</span> Arquivadas</button></li>
+      </ul>
 
-    <!-- Estado de erro -->
-    <div id="erro" class="banner banner--erro" role="alert" hidden>
-      <span aria-hidden="true">⚠️</span>
-      <p id="erroMensagem"></p>
-    </div>
+      <button id="btnSair" class="sidebar__sair" type="button"><span aria-hidden="true">🚪</span> Sair</button>
+    </nav>
 
-    <!-- Aviso parcial (algumas palavras-chave falharam mas há resultados) -->
-    <div id="avisoParcial" class="banner banner--aviso" role="status" hidden>
-      <span aria-hidden="true">ℹ️</span>
-      <p id="avisoParcialMensagem"></p>
-    </div>
+    <main class="conteudo">
 
-    <!-- Resumo + resultados -->
-    <section aria-label="Resultados da busca">
-      <p id="resumoResultados" class="resumo-resultados" hidden></p>
-      <div id="resultados" class="resultados"></div>
-      <p id="semResultados" class="sem-resultados" hidden>Nenhuma licitação encontrada para os filtros selecionados.</p>
-    </section>
+      <!-- ABA 1: Buscar Licitações -->
+      <section id="painel-buscar" class="painel-aba">
+        <section class="card filtros" aria-label="Filtros de busca">
+          <div class="filtros__grid">
+            <div class="campo">
+              <label for="uf">Estado (UF)</label>
+              <select id="uf" name="uf">
+                <option value="">Todos os estados</option>
+              </select>
+            </div>
 
-    <!-- Paginação -->
-    <nav id="paginacao" class="paginacao" aria-label="Paginação de resultados" hidden></nav>
-  </main>
+            <div class="campo">
+              <label for="modalidade">Modalidade da contratação</label>
+              <select id="modalidade" name="modalidade">
+                <option value="">Todas as modalidades</option>
+              </select>
+            </div>
 
-  <template id="templateCardLicitacao">
-    <article class="licitacao-card" tabindex="0" role="link">
-      <header class="licitacao-card__header">
-        <h2 class="licitacao-card__titulo"></h2>
-        <span class="chip chip--modalidade"></span>
-      </header>
-      <p class="licitacao-card__orgao">
-        <span class="licitacao-card__orgao-rotulo">Órgão:</span>
-        <span class="licitacao-card__orgao-valor"></span>
-      </p>
-      <p class="licitacao-card__local"></p>
-      <p class="licitacao-card__objeto"></p>
-      <footer class="licitacao-card__footer">
-        <span class="chip chip--situacao"></span>
-        <span class="chip chip--data"></span>
-        <span class="chip chip--data-inicio"></span>
-        <span class="chip chip--data-fim"></span>
-        <span class="chip chip--palavra"></span>
-      </footer>
-    </article>
-  </template>
+            <div class="campo">
+              <label for="orgao">Órgão</label>
+              <input type="text" id="orgao" name="orgao" placeholder="Ex.: Secretaria de Educação" />
+            </div>
+
+            <div class="campo">
+              <label for="dataInicial">Data inicial</label>
+              <input type="date" id="dataInicial" name="dataInicial" />
+            </div>
+
+            <div class="campo">
+              <label for="dataFinal">Data final</label>
+              <input type="date" id="dataFinal" name="dataFinal" />
+            </div>
+
+            <div class="campo">
+              <label for="ordenacao">Ordenar por</label>
+              <select id="ordenacao" name="ordenacao">
+                <!-- Opções preenchidas dinamicamente via js/keywords.js -->
+              </select>
+            </div>
+          </div>
+
+          <fieldset class="palavras-chave">
+            <legend>Situação</legend>
+            <div id="listaSituacoes" class="palavras-chave__lista">
+              <!-- Checkboxes preenchidos dinamicamente via js/keywords.js -->
+            </div>
+          </fieldset>
+
+          <fieldset class="palavras-chave">
+            <legend>Palavras-chave</legend>
+            <div id="listaPalavrasChave" class="palavras-chave__lista">
+              <!-- Chips preenchidos dinamicamente via js/keywords.js -->
+            </div>
+            <div class="palavras-chave__adicionar">
+              <input
+                type="text"
+                id="novaPalavraChave"
+                placeholder="Adicionar palavra-chave e pressionar Enter"
+                maxlength="80"
+              />
+              <button id="btnAdicionarPalavraChave" class="botao botao--texto" type="button">+ Adicionar</button>
+            </div>
+          </fieldset>
+
+          <div class="filtros__acoes">
+            <span id="mensagemValidacao" class="mensagem-validacao" role="alert"></span>
+            <button id="btnPesquisar" class="botao botao--primario" type="button">
+              <span class="botao__icone" aria-hidden="true">🔍</span>
+              Pesquisar
+            </button>
+          </div>
+        </section>
+
+        <div id="loading" class="loading" hidden>
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Consultando o PNCP, aguarde...</p>
+        </div>
+
+        <div id="erro" class="banner banner--erro" role="alert" hidden>
+          <span aria-hidden="true">⚠️</span>
+          <p id="erroMensagem"></p>
+        </div>
+
+        <div id="avisoParcial" class="banner banner--aviso" role="status" hidden>
+          <span aria-hidden="true">ℹ️</span>
+          <p id="avisoParcialMensagem"></p>
+        </div>
+
+        <section aria-label="Resultados da busca">
+          <p id="resumoResultados" class="resumo-resultados" hidden></p>
+          <div id="resultados" class="resultados"></div>
+          <p id="semResultados" class="sem-resultados" hidden>Nenhuma licitação encontrada para os filtros selecionados.</p>
+        </section>
+
+        <nav id="paginacao" class="paginacao" aria-label="Paginação de resultados" hidden></nav>
+      </section>
+
+      <!-- ABA 2: Em análise -->
+      <section id="painel-em-analise" class="painel-aba" hidden>
+        <h1 class="painel-aba__titulo">Em análise</h1>
+        <p class="painel-aba__descricao">Licitações interessantes que ainda não tiveram proposta enviada.</p>
+        <div id="listaEmAnalise" class="resultados"></div>
+        <p id="semEmAnalise" class="sem-resultados" hidden>Nenhuma licitação em análise no momento.</p>
+      </section>
+
+      <!-- ABA 3: Propostas enviadas -->
+      <section id="painel-propostas" class="painel-aba" hidden>
+        <h1 class="painel-aba__titulo">Propostas enviadas</h1>
+        <p class="painel-aba__descricao">Todas as licitações em que sua empresa participou.</p>
+        <div id="listaPropostas" class="resultados"></div>
+        <p id="semPropostas" class="sem-resultados" hidden>Nenhuma proposta enviada ainda.</p>
+      </section>
+
+      <!-- ABA 4: Contratos ganhos -->
+      <section id="painel-contratos" class="painel-aba" hidden>
+        <h1 class="painel-aba__titulo">Contratos ganhos</h1>
+        <p class="painel-aba__descricao">Propostas vencedoras.</p>
+        <div id="listaContratos" class="resultados"></div>
+        <p id="semContratos" class="sem-resultados" hidden>Nenhum contrato ganho ainda.</p>
+      </section>
+
+      <!-- ABA 5: Arquivadas -->
+      <section id="painel-arquivadas" class="painel-aba" hidden>
+        <h1 class="painel-aba__titulo">Arquivadas</h1>
+        <p class="painel-aba__descricao">Licitações descartadas. Podem ser restauradas a qualquer momento.</p>
+        <div id="listaArquivadas" class="resultados"></div>
+        <p id="semArquivadas" class="sem-resultados" hidden>Nenhuma licitação arquivada.</p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Client oficial do Supabase (build UMD, sem necessidade de bundler) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <script src="js/keywords.js"></script>
-  <script src="js/api.js"></script>
+
+  <script src="js/pncp/cache.js"></script>
+  <script src="js/pncp/texto.js"></script>
+  <script src="js/pncp/situacao.js"></script>
+  <script src="js/pncp/normalize.js"></script>
+  <script src="js/pncp/pncpClient.js"></script>
+  <script src="js/pncp/licitacoesService.js"></script>
+
+  <script src="js/pipeline/supabaseClient.js"></script>
+  <script src="js/pipeline/motivos.js"></script>
+  <script src="js/pipeline/auth.js"></script>
+  <script src="js/pipeline/pipelineRepository.js"></script>
+  <script src="js/pipeline/formularios.js"></script>
+
+  <script src="js/toast.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/modal.js"></script>
   <script src="js/ui.js"></script>
-  <script src="js/main.js"></script>
+
+  <script src="js/tabs/tabBuscar.js"></script>
+  <script src="js/tabs/tabEmAnalise.js"></script>
+  <script src="js/tabs/tabPropostas.js"></script>
+  <script src="js/tabs/tabContratos.js"></script>
+  <script src="js/tabs/tabArquivadas.js"></script>
+
+  <script src="js/shell.js"></script>
 </body>
 </html>

@@ -1,212 +1,185 @@
-# Busca de Licitações — PNCP
+# Pipeline de Licitações — PNCP
 
-Sistema web completo (backend Node.js/Express + frontend HTML/CSS/JS puro) para
-pesquisar licitações no **Portal Nacional de Contratações Públicas (PNCP)** por
-Estado, período e múltiplas palavras-chave simultaneamente.
+Sistema web 100% estático (HTML/CSS/JS puro, sem build step) para buscar licitações no
+**Portal Nacional de Contratações Públicas (PNCP)** e acompanhar o pipeline comercial da
+sua empresa: o que está em análise, propostas enviadas, contratos ganhos e itens
+arquivados. Hospedado no **GitHub Pages**; dados de negócio (classificação, propostas,
+contratos) persistidos no **Supabase** (Postgres + Auth), protegidos por login.
 
-## Estrutura do projeto
+## Arquitetura
+
+Não existe backend próprio. Duas integrações externas, ambas chamadas direto do navegador:
+
+- **API de busca do PNCP** (`https://pncp.gov.br/api/search/`) — o mesmo serviço usado
+  pelo próprio portal em `pncp.gov.br/app/editais`. Libera CORS para qualquer origem
+  (`Access-Control-Allow-Origin: *`), por isso dá pra chamar direto do navegador sem
+  precisar de um proxy.
+- **Supabase** — Postgres + Auth. Guarda a classificação de cada licitação (em análise,
+  proposta enviada, arquivada) e os dados de proposta/contrato. Protegido por Row Level
+  Security: cada usuário só enxerga e altera as próprias linhas.
 
 ```
-.
-├── backend/
-│   ├── server.js                       # Ponto de entrada (Express)
-│   ├── package.json
-│   ├── .env.example
-│   └── src/
-│       ├── config/
-│       │   ├── env.js                  # Leitura das variáveis de ambiente
-│       │   └── constants.js            # UFs válidas e palavras-chave padrão
-│       ├── routes/
-│       │   └── licitacoes.routes.js    # GET /api/licitacoes
-│       ├── controllers/
-│       │   └── licitacoes.controller.js
-│       ├── services/
-│       │   ├── pncpClient.js           # Chamada HTTP crua à API do PNCP
-│       │   └── licitacoesService.js    # Busca simultânea, merge, dedupe, filtro, cache, paginação
-│       ├── utils/
-│       │   ├── cache.js                # Instância NodeCache + chave de cache
-│       │   ├── normalize.js            # Normaliza item do PNCP -> formato da API própria
-│       │   └── validate.js             # Validação dos filtros recebidos
-│       └── middleware/
-│           └── errorHandler.js
-└── frontend/
-    ├── index.html
-    ├── css/
-    │   └── style.css                   # Estilo inspirado em Material Design, responsivo
-    └── js/
-        ├── keywords.js                 # UFs e palavras-chave pré-selecionadas
-        ├── api.js                      # Acesso à API própria (fetch)
-        ├── ui.js                       # Manipulação do DOM
-        └── main.js                     # Orquestração dos eventos da página
+frontend/                    (publicado no GitHub Pages)
+├── index.html                tela de login + app-shell (sidebar com 5 abas)
+├── css/style.css
+└── js/
+    ├── keywords.js            UFs, modalidades, ordenação, situações, palavras-chave padrão
+    ├── pncp/                  lógica de busca no PNCP (sem servidor)
+    │   ├── cache.js             cache em memória (Map + TTL)
+    │   ├── texto.js             busca de órgão tolerante a acento
+    │   ├── situacao.js          classifica aberta/encerra hoje/encerrada (fuso Brasília)
+    │   ├── normalize.js         formato cru do PNCP → formato usado no app
+    │   ├── pncpClient.js        fetch() na API de busca do PNCP
+    │   └── licitacoesService.js busca paralela por palavra-chave, dedupe, filtros, paginação
+    ├── pipeline/              camada que fala com o Supabase
+    │   ├── supabaseClient.js    cria o client (URL + anon key — ver "Configuração" abaixo)
+    │   ├── auth.js               login / logout / sessão
+    │   ├── motivos.js            motivos de arquivamento
+    │   ├── pipelineRepository.js único módulo que lê/grava a tabela licitacoes_pipeline
+    │   └── formularios.js        formulários dos modais (Enviar proposta / Editar contrato)
+    ├── cards.js                componente de card único, reusado pelas 5 abas
+    ├── modal.js                 modal genérico
+    ├── toast.js                  aviso curto para falhas de escrita
+    ├── ui.js                    painel de filtros da aba Buscar
+    ├── shell.js                  gate de login + troca de aba da sidebar
+    └── tabs/                   um módulo por aba (buscar, em-análise, propostas, contratos, arquivadas)
+.github/workflows/deploy-pages.yml   publica frontend/ no GitHub Pages a cada push
 ```
 
-## Como a integração com o PNCP funciona
+## As 5 abas
 
-O backend consome o mesmo serviço de busca usado pelo próprio portal
-(`https://pncp.gov.br/api/search/`), que é o que permite pesquisa textual por
-palavra-chave (a API oficial documentada de consulta,
-`/api/consulta/v1/contratacoes/publicacao`, não oferece busca por palavra-chave —
-apenas filtros por data/modalidade/UF).
+1. **Buscar Licitações** — busca no PNCP com os filtros de sempre (UF, modalidade, órgão,
+   período, situação, palavras-chave livres). Só mostra licitações **ainda não
+   classificadas**. Ações em cada card: 👁️ Abrir no PNCP, ⭐ Salvar para analisar depois,
+   ❌ Não atende, 📄 Enviado proposta (abre um formulário pedindo data e valor).
+2. **Em análise** — o que foi salvo para decidir depois. Ações: abrir, enviar proposta,
+   marcar como não atende.
+3. **Propostas enviadas** — histórico permanente de tudo em que a empresa participou.
+   Mostra data e valor da proposta; a situação (⏳ Aguardando / 🏆 Venceu / ❌ Não venceu /
+   🚫 Cancelada) é alterável a qualquer momento e nunca arquiva o item sozinha.
+4. **Contratos ganhos** — filtro automático das propostas com situação "Venceu". Tem uma
+   ação **"Editar contrato"** para preencher valor, vigência, número do contrato, empenho
+   e ordem de fornecimento (esses campos não têm outro lugar para serem preenchidos).
+5. **Arquivadas** — tudo marcado como "não atende". Some da aba de busca. Botão
+   **Restaurar** devolve o item para a busca (não apaga o histórico, só marca como
+   "não classificado" de novo).
 
-Fluxo de uma busca (`GET /api/licitacoes`):
+## Configuração (obrigatória antes de usar)
 
-1. O backend dispara, **em paralelo**, uma busca no PNCP para cada palavra-chave
-   selecionada (até algumas páginas mais recentes por palavra, configurável).
-2. Os resultados de todas as palavras-chave são **unidos**.
-3. Licitações **duplicadas** (encontradas por mais de uma palavra-chave) são
-   **eliminadas**, mantendo a palavra-chave que a encontrou primeiro.
-4. Os filtros de **UF** e **período** são aplicados sobre o conjunto já unido —
-   isso é feito no backend porque o endpoint de busca do PNCP não garante
-   filtragem confiável desses campos do lado do servidor.
-5. O resultado filtrado é ordenado por data de publicação (mais recentes primeiro),
-   **armazenado em cache** (por combinação de filtros) e então paginado.
+### 1. Criar o projeto no Supabase
 
-Por causa do passo 4, buscas por períodos muito antigos podem não trazer todos os
-resultados existentes, já que o backend busca apenas as páginas mais recentes de
-cada palavra-chave (limite configurável em `PNCP_MAX_PAGES_POR_PALAVRA`). Isso evita
-sobrecarregar a API pública do PNCP com buscas muito amplas.
+Crie uma conta e um projeto em [supabase.com](https://supabase.com). No **SQL Editor** do
+projeto, rode:
 
-## Pré-requisitos
+```sql
+create table public.licitacoes_pipeline (
+  id                            uuid primary key default gen_random_uuid(),
+  usuario_id                    uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  licitacao_id                  text not null,
+  snapshot                      jsonb not null,
+  status                        text not null check (status in
+                                  ('em_analise','proposta_enviada','arquivada','restaurada')),
+  motivo_arquivamento           text,
+  data_proposta                 date,
+  valor_proposta                numeric(14,2),
+  situacao_proposta             text check (situacao_proposta in
+                                  ('aguardando','venceu','nao_venceu','cancelada')),
+  contrato_valor                numeric(14,2),
+  contrato_vigencia_inicio      date,
+  contrato_vigencia_fim         date,
+  contrato_numero               text,
+  contrato_empenho               text,
+  contrato_ordem_fornecimento    text,
+  criado_em                     timestamptz not null default now(),
+  atualizado_em                  timestamptz not null default now(),
+  unique (usuario_id, licitacao_id)
+);
 
-- Node.js 18 ou superior
+create index licitacoes_pipeline_usuario_status_idx
+  on public.licitacoes_pipeline (usuario_id, status);
 
-## Como executar
+create function public.tg_licitacoes_pipeline_atualizado_em()
+returns trigger language plpgsql as $$
+begin
+  new.atualizado_em := now();
+  return new;
+end;
+$$;
+
+create trigger trg_licitacoes_pipeline_atualizado_em
+  before update on public.licitacoes_pipeline
+  for each row execute function public.tg_licitacoes_pipeline_atualizado_em();
+
+alter table public.licitacoes_pipeline enable row level security;
+
+create policy "select_proprias_linhas" on public.licitacoes_pipeline
+  for select using (auth.uid() = usuario_id);
+create policy "insert_proprias_linhas" on public.licitacoes_pipeline
+  for insert with check (auth.uid() = usuario_id);
+create policy "update_proprias_linhas" on public.licitacoes_pipeline
+  for update using (auth.uid() = usuario_id) with check (auth.uid() = usuario_id);
+create policy "delete_proprias_linhas" on public.licitacoes_pipeline
+  for delete using (auth.uid() = usuario_id);
+```
+
+### 2. Criar seu usuário
+
+Não existe tela de cadastro no app. Vá em **Authentication → Users → Add user** no
+dashboard do Supabase e crie seu usuário (email + senha) manualmente.
+
+Depois, em **Authentication → Providers → Email**, desative **"Allow new users to
+sign up"** — defesa extra, já que a chave pública do projeto fica visível no código
+(ver por quê abaixo).
+
+### 3. Preencher as credenciais no código
+
+Em **Settings → API**, copie a **Project URL** e a **anon public key**, e cole em
+[`frontend/js/pipeline/supabaseClient.js`](frontend/js/pipeline/supabaseClient.js):
+
+```js
+const SUPABASE_URL = 'https://xxxxxxxxxxxx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJ...';
+```
+
+Essas duas informações são **seguras para ficar públicas** no repositório — a chave
+`anon` não concede acesso nenhum sozinha, é só um identificador do projeto. A segurança
+de verdade está nas políticas de RLS do passo 1 (cada usuário só acessa as próprias
+linhas).
+
+### 4. Publicar no GitHub Pages
+
+Já está configurado: o workflow [`deploy-pages.yml`](.github/workflows/deploy-pages.yml)
+publica a pasta `frontend/` a cada push na branch `master`. Basta commitar as
+credenciais do passo 3 e enviar.
+
+## Rodando localmente
+
+Como não há backend nem build step, basta servir a pasta `frontend/` com qualquer
+servidor estático (não pode ser aberta como `file://` direto, porque módulos/CORS exigem
+um servidor http real):
 
 ```bash
-cd backend
-npm install
-cp .env.example .env   # no Windows (PowerShell): copy .env.example .env
-npm start
+cd frontend
+python -m http.server 8080
+# ou: npx serve
 ```
 
-Acesse **http://localhost:3000** no navegador. O próprio backend serve os
-arquivos do frontend (não é necessário nenhum outro servidor nem configurar CORS).
+Acesse `http://localhost:8080`.
 
-Para desenvolvimento com recarregamento automático ao salvar arquivos:
+## Notas técnicas / decisões
 
-```bash
-npm run dev
-```
-
-## Variáveis de ambiente (`backend/.env`)
-
-| Variável                       | Descrição                                                          | Padrão                              |
-|---------------------------------|----------------------------------------------------------------------|--------------------------------------|
-| `PORT`                          | Porta do servidor Express                                            | `3000`                               |
-| `PNCP_SEARCH_URL`                | URL do serviço de busca do PNCP                                      | `https://pncp.gov.br/api/search/`   |
-| `PNCP_APP_URL`                   | URL base para montar o link oficial da licitação                     | `https://pncp.gov.br/app`           |
-| `PNCP_TIMEOUT_MS`                | Timeout de cada requisição ao PNCP (ms)                               | `15000`                              |
-| `PNCP_MAX_PAGES_POR_PALAVRA`     | Páginas mais recentes buscadas por palavra-chave                     | `3`                                   |
-| `PNCP_TAMANHO_PAGINA_UPSTREAM`   | Itens por página solicitados ao PNCP                                  | `50`                                  |
-| `CACHE_TTL_SEGUNDOS`             | Tempo de vida do cache de buscas                                      | `300`                                 |
-
-## Endpoint da API própria
-
-```
-GET /api/licitacoes
-```
-
-| Parâmetro       | Obrigatório | Descrição                                              |
-|-----------------|:-----------:|----------------------------------------------------------|
-| `palavrasChave`  | sim         | Lista separada por vírgula. Aceita qualquer termo, não só os sugeridos (ex.: `Mesas,Cadeiras,ventilador industrial`) |
-| `uf`             | não         | Sigla do estado (ex.: `SP`)                              |
-| `modalidade`     | não         | Uma das modalidades da tabela de domínio do PNCP (ex.: `Pregão - Eletrônico`) |
-| `orgao`          | não         | Busca parcial e tolerante a acentos no nome do órgão (ex.: `saude` encontra "SAÚDE") |
-| `ordenacao`      | não         | `data_desc` (padrão), `data_asc`, `titulo_asc`, `titulo_desc`, `orgao_asc`, `orgao_desc` |
-| `situacoes`      | não         | Lista separada por vírgula com `aberta`, `encerra_hoje` e/ou `encerrada`. Vazio/omitido = sem filtro |
-| `dataInicial`    | não         | `AAAA-MM-DD`                                              |
-| `dataFinal`      | não         | `AAAA-MM-DD`                                               |
-| `pagina`         | não         | Padrão `1`                                                 |
-| `tamanhoPagina`  | não         | Padrão `12`, máximo `50`                                   |
-
-Exemplo de resposta:
-
-```json
-{
-  "pagina": 1,
-  "tamanhoPagina": 12,
-  "totalRegistros": 37,
-  "totalPaginas": 4,
-  "resultados": [
-    {
-      "id": "07954480000179-1-020079/2026",
-      "titulo": "Pregão Eletrônico nº 202624275/2026",
-      "orgao": "ESTADO DO CEARA",
-      "uf": "CE",
-      "municipio": "Itapiúna",
-      "dataPublicacao": "2026-07-31T08:13:30.128413",
-      "dataFimVigencia": "2026-08-20T08:00",
-      "situacao": "aberta",
-      "modalidade": "Pregão - Eletrônico",
-      "objetoResumido": "AQUISIÇÃO DE MOBILIÁRIO ESCOLAR (MESAS E CADEIRAS) PARA...",
-      "palavraChave": "Mesas",
-      "linkPncp": "https://pncp.gov.br/app/editais/07954480000179/2026/20079"
-    }
-  ],
-  "keywordsComErro": []
-}
-```
-
-`keywordsComErro` lista as palavras-chave cuja consulta ao PNCP falhou (timeout,
-instabilidade etc.), permitindo exibir os demais resultados normalmente com um aviso.
-
-`situacao` é calculada a cada requisição (não fica congelada no cache) a partir de
-`dataFimVigencia`, comparando com o horário atual no fuso de Brasília:
-`aberta` (ainda falta mais de um dia), `encerra_hoje` (fecha ainda hoje) ou
-`encerrada` (prazo já passou). Licitações sem essa data não são classificadas e só
-aparecem quando nenhum filtro de situação está selecionado.
-
-## Funcionalidades do frontend
-
-- Filtro por Estado (UF), Modalidade da contratação, Órgão (busca parcial) e
-  por período (data inicial/final).
-- Filtro por Situação da licitação: **Aberta para propostas** e **Encerra hoje**
-  (ambas marcadas por padrão) e **Encerrada** (desmarcada por padrão). Cada card
-  também exibe um selo colorido com a situação calculada.
-- Ordenação dos resultados (mais recentes/antigas primeiro, título A-Z/Z-A,
-  órgão A-Z/Z-A).
-- Lista de palavras-chave pré-selecionadas em checkbox, todas marcadas por padrão.
-  Cada uma pode ser desmarcada (não participa da busca) ou **removida** por completo
-  (botão "×" no chip), e o usuário pode **adicionar** quantas palavras-chave próprias
-  quiser pelo campo de texto abaixo da lista.
-- Botão **Pesquisar** que envia apenas as palavras-chave marcadas no momento.
-- Cartões de resultado (estilo Material Design) exibindo título, órgão, estado,
-  município, data de publicação, modalidade, objeto resumido e a palavra-chave
-  que gerou o resultado.
-- Clique em qualquer cartão abre a página oficial da licitação no PNCP em uma
-  nova aba (`target="_blank"` com `rel="noopener noreferrer"`).
-- Indicador de carregamento durante a busca.
-- Tratamento de erros de rede/servidor com mensagem amigável.
-- Paginação dos resultados.
-- Layout responsivo (grid adaptável, mobile-first nos breakpoints principais).
-
-## Deploy gratuito (Render)
-
-O GitHub por si só não executa o backend (só hospeda o código). Este projeto inclui
-um `render.yaml` na raiz para subir o backend gratuitamente no [Render](https://render.com),
-que serve tanto a API quanto o frontend estático a partir do mesmo serviço Node.
-
-Passo a passo:
-
-1. Crie uma conta em https://render.com e conecte sua conta do GitHub.
-2. No painel do Render, clique em **New +** → **Blueprint**.
-3. Selecione o repositório `pncp-licitacoes`. O Render vai detectar o `render.yaml`
-   automaticamente e propor a criação do serviço `pncp-licitacoes` (plano `free`).
-4. Confirme a criação. O Render já builda (`npm install`) e sobe (`npm start`)
-   sozinho a cada novo `git push` na branch principal.
-5. Ao final, você recebe uma URL pública do tipo `https://pncp-licitacoes.onrender.com`.
-
-Observações do plano gratuito do Render: o serviço "dorme" após um período sem uso e
-demora alguns segundos para acordar na primeira requisição seguinte — normal do free tier.
-
-Se preferir outro provedor (Railway, Fly.io, um VPS, etc.), qualquer um que rode
-Node.js 18+ funciona: basta configurar `rootDir`/diretório de trabalho como `backend/`,
-comando de build `npm install` e comando de start `npm start`.
-
-## Notas técnicas
-
-- Sem frameworks no frontend: HTML + CSS + JavaScript puro (sem build step).
-- Um único servidor Express serve API e frontend, eliminando a necessidade de CORS.
-- Cache em memória (`node-cache`) evita repetir chamadas idênticas ao PNCP.
-- Código dividido em camadas (rotas → controller → service → cliente HTTP) tanto
-  no backend quanto no frontend (api → ui → main), facilitando manutenção e testes.
+- **Sem paginação nas abas 2-5** — listas pessoais de pipeline tendem a ser pequenas; dá
+  pra adicionar depois se necessário.
+- **`motivo_arquivamento` é texto livre** (sem `check constraint` no banco) — a lista de
+  motivos válidos vive só em `frontend/js/pipeline/motivos.js`, para adicionar um motivo
+  novo não exigir migração de banco.
+- **Todas as escritas no pipeline são upsert**, nunca insert puro — qualquer licitação
+  pode já ter uma linha (inclusive com `status='restaurada'`).
+- **Cada troca de aba busca de novo no Supabase** (sem cache entre abas) — mais simples
+  que manter um estado compartilhado, e garante que uma reclassificação feita numa aba
+  apareça nas outras imediatamente.
+- Se a checagem de "já classificados" falhar (Supabase fora do ar), a aba Buscar **não
+  trava** — mostra um aviso e segue exibindo a busca do PNCP sem esse filtro.
+- O cache client-side (`pncp/cache.js`) e o limite de concorrência nas buscas por
+  palavra-chave (`pncp/licitacoesService.js`) existem para não sobrecarregar a API
+  pública do PNCP com tráfego repetido/paralelo demais.

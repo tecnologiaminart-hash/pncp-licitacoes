@@ -1,12 +1,5 @@
-# Dependências instaladas (recriadas com `npm install`)
-backend/node_modules/
-
-# Variáveis de ambiente locais (contém configuração específica da máquina)
-backend/.env
-
 # Logs
 *.log
-npm-debug.log*
 
 # Arquivos de sistema
 .DS_Store

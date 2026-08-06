@@ -22,12 +22,6 @@ const Ui = (() => {
   const elResultados = document.getElementById('resultados');
   const elSemResultados = document.getElementById('semResultados');
   const elPaginacao = document.getElementById('paginacao');
-  const templateCard = document.getElementById('templateCardLicitacao');
-
-  const formatadorData = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const formatadorDataHora = new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
-  });
 
   function preencherUfs() {
     UFS.forEach((uf) => {
@@ -149,71 +143,21 @@ const Ui = (() => {
     elErro.hidden = true;
   }
 
+  function mostrarAviso(mensagem) {
+    if (!mensagem) {
+      elAvisoParcial.hidden = true;
+      return;
+    }
+    elAvisoParcialMensagem.textContent = mensagem;
+    elAvisoParcial.hidden = false;
+  }
+
   function mostrarAvisoParcial(palavrasComErro) {
     if (!palavrasComErro || palavrasComErro.length === 0) {
       elAvisoParcial.hidden = true;
       return;
     }
-    elAvisoParcialMensagem.textContent =
-      `Não foi possível consultar o PNCP para: ${palavrasComErro.join(', ')}. Os demais resultados são exibidos normalmente.`;
-    elAvisoParcial.hidden = false;
-  }
-
-  function formatarData(isoString) {
-    if (!isoString) return 'Data não informada';
-    const data = new Date(isoString);
-    if (Number.isNaN(data.getTime())) return 'Data não informada';
-    return formatadorData.format(data);
-  }
-
-  function formatarDataHora(isoString) {
-    if (!isoString) return 'Não informado';
-    const data = new Date(isoString);
-    if (Number.isNaN(data.getTime())) return 'Não informado';
-    return formatadorDataHora.format(data);
-  }
-
-  function criarCard(licitacao) {
-    const fragmento = templateCard.content.cloneNode(true);
-    const artigo = fragmento.querySelector('.licitacao-card');
-
-    fragmento.querySelector('.licitacao-card__titulo').textContent = licitacao.titulo;
-    fragmento.querySelector('.chip--modalidade').textContent = licitacao.modalidade;
-    fragmento.querySelector('.licitacao-card__orgao-valor').textContent = licitacao.orgao;
-    fragmento.querySelector('.licitacao-card__local').textContent =
-      `${licitacao.municipio || 'Município não informado'} — ${licitacao.uf || 'UF não informada'}`;
-    fragmento.querySelector('.licitacao-card__objeto').textContent = licitacao.objetoResumido;
-    fragmento.querySelector('.chip--data').textContent = `Publicação: ${formatarData(licitacao.dataPublicacao)}`;
-    fragmento.querySelector('.chip--data-inicio').textContent = `Início: ${formatarDataHora(licitacao.dataInicioVigencia)}`;
-    fragmento.querySelector('.chip--data-fim').textContent = `Fim: ${formatarDataHora(licitacao.dataFimVigencia)}`;
-    fragmento.querySelector('.chip--palavra').textContent = `#${licitacao.palavraChave}`;
-
-    const infoSituacao = SITUACAO_INFO[licitacao.situacao];
-    const chipSituacao = fragmento.querySelector('.chip--situacao');
-    if (infoSituacao) {
-      chipSituacao.textContent = infoSituacao.label;
-      chipSituacao.classList.add(infoSituacao.classe);
-    } else {
-      chipSituacao.textContent = 'Situação não informada';
-    }
-
-    const abrirLink = () => window.open(licitacao.linkPncp, '_blank', 'noopener,noreferrer');
-    artigo.addEventListener('click', abrirLink);
-    artigo.addEventListener('keydown', (evento) => {
-      if (evento.key === 'Enter' || evento.key === ' ') {
-        evento.preventDefault();
-        abrirLink();
-      }
-    });
-    artigo.setAttribute('aria-label', `Abrir no PNCP: ${licitacao.titulo}`);
-
-    return fragmento;
-  }
-
-  function renderizarResultados(resultados) {
-    elResultados.innerHTML = '';
-    elSemResultados.hidden = resultados.length > 0;
-    resultados.forEach((licitacao) => elResultados.appendChild(criarCard(licitacao)));
+    mostrarAviso(`Não foi possível consultar o PNCP para: ${palavrasComErro.join(', ')}. Os demais resultados são exibidos normalmente.`);
   }
 
   function renderizarResumo({ totalRegistros, pagina, totalPaginas }) {
@@ -273,6 +217,8 @@ const Ui = (() => {
     elOrdenacao,
     elNovaPalavraChave,
     elBtnAdicionarPalavraChave,
+    elResultados,
+    elSemResultados,
     preencherUfs,
     preencherModalidades,
     preencherOrdenacao,
@@ -285,8 +231,8 @@ const Ui = (() => {
     alternarLoading,
     mostrarErro,
     esconderErro,
+    mostrarAviso,
     mostrarAvisoParcial,
-    renderizarResultados,
     renderizarResumo,
     renderizarPaginacao,
     limparResultadosAntesDaBusca,

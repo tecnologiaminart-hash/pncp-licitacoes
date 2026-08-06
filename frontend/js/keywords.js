@@ -48,6 +48,14 @@ const SITUACAO_INFO = {
   encerrada: { label: 'Encerrada', classe: 'chip--situacao-encerrada' },
 };
 
+// Situações possíveis de uma proposta já enviada (aba "Propostas enviadas").
+const OPCOES_SITUACAO_PROPOSTA = [
+  { value: 'aguardando', label: '⏳ Aguardando resultado' },
+  { value: 'venceu', label: '🏆 Venceu' },
+  { value: 'nao_venceu', label: '❌ Não venceu' },
+  { value: 'cancelada', label: '🚫 Cancelada' },
+];
+
 // Sugestões iniciais; o usuário pode remover qualquer uma e adicionar termos próprios.
 const PALAVRAS_CHAVE_PADRAO = [
   'Mobiliário',
