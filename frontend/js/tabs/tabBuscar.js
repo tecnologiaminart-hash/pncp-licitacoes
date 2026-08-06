@@ -12,7 +12,6 @@ const TabBuscar = (() => {
     return {
       uf: Ui.elUf.value,
       modalidade: Ui.elModalidade.value,
-      orgao: Ui.elOrgao.value.trim(),
       ordenacao: Ui.elOrdenacao.value,
       situacoes: Ui.obterSituacoesSelecionadas(),
       dataInicial: elDataInicial.value,

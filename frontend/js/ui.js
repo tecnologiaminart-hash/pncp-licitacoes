@@ -5,7 +5,6 @@
 const Ui = (() => {
   const elUf = document.getElementById('uf');
   const elModalidade = document.getElementById('modalidade');
-  const elOrgao = document.getElementById('orgao');
   const elOrdenacao = document.getElementById('ordenacao');
   const elListaSituacoes = document.getElementById('listaSituacoes');
   const elListaPalavras = document.getElementById('listaPalavrasChave');
@@ -213,7 +212,6 @@ const Ui = (() => {
   return {
     elUf,
     elModalidade,
-    elOrgao,
     elOrdenacao,
     elNovaPalavraChave,
     elBtnAdicionarPalavraChave,
