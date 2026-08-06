@@ -64,7 +64,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 100px 56px;
+  padding: 64px 56px;
   border-radius: 4px;
   border: 1px solid var(--cor-borda);
   box-shadow: none;
