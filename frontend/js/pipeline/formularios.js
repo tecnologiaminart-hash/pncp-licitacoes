@@ -1,6 +1,5 @@
-// Formulários usados dentro do Modal genérico (js/modal.js): "Enviado proposta" e
-// "Editar contrato". Centralizados aqui porque mais de uma aba precisa do formulário de
-// proposta (Buscar Licitações e Em análise).
+// Formulário "Editar contrato", usado dentro do Modal genérico (js/modal.js) pela aba
+// Contratos ganhos.
 const PipelineFormularios = (() => {
   function criarCampo(rotulo, tipo, id, opcoes = {}) {
     const wrapper = document.createElement('div');
@@ -49,45 +48,6 @@ const PipelineFormularios = (() => {
     erro.className = 'mensagem-validacao';
     erro.setAttribute('role', 'alert');
     return erro;
-  }
-
-  /**
-   * Abre o modal com o formulário "📄 Enviar proposta" (data + valor enviado).
-   * @param {(dados: {dataProposta: string, valorProposta: number}) => Promise<void>} aoConfirmar
-   */
-  function abrirFormularioProposta(aoConfirmar) {
-    const form = document.createElement('form');
-    form.className = 'form-modal';
-
-    const titulo = document.createElement('h2');
-    titulo.className = 'form-modal__titulo';
-    titulo.textContent = '📄 Enviar proposta';
-
-    const { wrapper: wData, input: iData } = criarCampo('Data da proposta', 'date', 'formDataProposta', { required: true });
-    const { wrapper: wValor, input: iValor } = criarCampo('Valor enviado (R$)', 'number', 'formValorProposta', {
-      required: true, step: '0.01', min: '0',
-    });
-
-    const erro = criarMensagemErro();
-    const btnSalvar = criarBotaoSalvar();
-    form.append(titulo, wData, wValor);
-    criarRodapeForm(form, erro, btnSalvar);
-
-    form.addEventListener('submit', async (evento) => {
-      evento.preventDefault();
-      erro.textContent = '';
-      btnSalvar.disabled = true;
-      try {
-        await aoConfirmar({ dataProposta: iData.value, valorProposta: Number(iValor.value) });
-        Modal.fechar();
-      } catch (erroSalvar) {
-        erro.textContent = erroSalvar.message;
-        btnSalvar.disabled = false;
-      }
-    });
-
-    Modal.abrir(form);
-    iData.focus();
   }
 
   /**
@@ -151,5 +111,5 @@ const PipelineFormularios = (() => {
     iValor.focus();
   }
 
-  return { abrirFormularioProposta, abrirFormularioContrato };
+  return { abrirFormularioContrato };
 })();

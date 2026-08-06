@@ -77,14 +77,12 @@ const PipelineRepository = (() => {
   }
 
   /** 📄 Enviado proposta. */
-  function marcarPropostaEnviada(licitacao, { dataProposta, valorProposta }) {
+  function marcarPropostaEnviada(licitacao) {
     return upsert({
       licitacao_id: licitacao.id,
       snapshot: licitacao,
       status: 'proposta_enviada',
       situacao_proposta: 'aguardando',
-      data_proposta: dataProposta,
-      valor_proposta: valorProposta,
     });
   }
 

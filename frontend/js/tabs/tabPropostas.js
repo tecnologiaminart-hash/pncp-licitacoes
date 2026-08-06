@@ -7,11 +7,6 @@ const TabPropostas = (() => {
   function preencherExtra(elCard, linha) {
     const extra = elCard.querySelector('.licitacao-card__extra');
 
-    const info = document.createElement('p');
-    info.className = 'proposta-info';
-    info.textContent = `Proposta enviada em ${CardLicitacao.formatarData(linha.data_proposta)} `
-      + `— Valor: ${CardLicitacao.formatarMoeda(linha.valor_proposta)}`;
-
     const campo = document.createElement('div');
     campo.className = 'campo campo--situacao-proposta';
     const label = document.createElement('label');
@@ -43,7 +38,7 @@ const TabPropostas = (() => {
     });
 
     campo.append(label, select);
-    extra.append(info, campo);
+    extra.append(campo);
   }
 
   async function renderizar() {

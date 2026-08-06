@@ -86,11 +86,15 @@ const TabBuscar = (() => {
         icone: '📄',
         rotulo: 'Enviado proposta',
         variante: 'proposta',
-        aoClicar: (lic, elCard) => {
-          PipelineFormularios.abrirFormularioProposta(async (dados) => {
-            await PipelineRepository.marcarPropostaEnviada(lic, dados);
+        aoClicar: async (lic, elCard, botao) => {
+          botao.disabled = true;
+          try {
+            await PipelineRepository.marcarPropostaEnviada(lic);
             removerCard(elCard);
-          });
+          } catch (erro) {
+            Toast.mostrarErro(erro.message);
+            botao.disabled = false;
+          }
         },
       },
     ];
