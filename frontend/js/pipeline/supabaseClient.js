@@ -9,8 +9,8 @@
 // pelo GitHub Pages.
 //
 // Preencha com os valores do seu projeto em Supabase → Settings → API.
-const SUPABASE_URL = 'COLOQUE_AQUI_A_PROJECT_URL_DO_SUPABASE';
-const SUPABASE_ANON_KEY = 'COLOQUE_AQUI_A_ANON_PUBLIC_KEY_DO_SUPABASE';
+const SUPABASE_URL = 'https://lfkzujgrarzrabhdxugs.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxma3p1amdyYXJ6cmFiaGR4dWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NzQ5NDEsImV4cCI6MjEwMTU1MDk0MX0.nkfGP0mbXt1Wde0Kw51qME7dSIA5CAJ7KRYNZdoGT7w';
 
 const SupabaseClient = (() => {
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
