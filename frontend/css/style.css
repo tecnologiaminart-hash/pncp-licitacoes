@@ -1,0 +1,456 @@
+/* ==========================================================================
+   Design tokens (paleta e elevação inspiradas em Material Design)
+   ========================================================================== */
+:root {
+  --cor-primaria: #1a73e8;
+  --cor-primaria-escura: #1558b0;
+  --cor-fundo: #f1f3f6;
+  --cor-superficie: #ffffff;
+  --cor-texto: #1f2430;
+  --cor-texto-secundario: #5f6470;
+  --cor-borda: #e0e3e9;
+  --cor-erro: #b3261e;
+  --cor-erro-fundo: #fdecea;
+  --cor-aviso-fundo: #fff4e5;
+  --cor-aviso-texto: #8a5a00;
+  --cor-sucesso: #1e8e3e;
+
+  --raio: 12px;
+  --raio-pequeno: 8px;
+
+  --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --sombra-2: 0 2px 6px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08);
+  --sombra-hover: 0 4px 10px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.1);
+
+  --transicao: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   Barra superior
+   ========================================================================== */
+.app-bar {
+  background: var(--cor-primaria);
+  color: #fff;
+  box-shadow: var(--sombra-2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-bar__content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-bar__logo {
+  font-size: 1.5rem;
+}
+
+.app-bar__title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Layout geral
+   ========================================================================== */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-1);
+  padding: 20px;
+}
+
+/* ==========================================================================
+   Filtros
+   ========================================================================== */
+.filtros__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cor-texto-secundario);
+}
+
+.campo select,
+.campo input {
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-pequeno);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  transition: border-color var(--transicao), box-shadow var(--transicao);
+}
+
+.campo select:focus,
+.campo input:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+}
+
+.palavras-chave {
+  border: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.palavras-chave legend {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cor-texto-secundario);
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.palavras-chave__lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkbox-palavra {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
+  padding: 6px 14px 6px 10px;
+  cursor: pointer;
+  transition: background var(--transicao), border-color var(--transicao);
+  user-select: none;
+  font-size: 0.88rem;
+}
+
+.checkbox-palavra:has(input:checked) {
+  background: rgba(26, 115, 232, 0.08);
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria-escura);
+}
+
+.checkbox-palavra input {
+  accent-color: var(--cor-primaria);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.filtros__acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.mensagem-validacao {
+  color: var(--cor-erro);
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+/* ==========================================================================
+   Botões
+   ========================================================================== */
+.botao {
+  border: none;
+  border-radius: var(--raio-pequeno);
+  padding: 11px 22px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background var(--transicao), box-shadow var(--transicao), transform var(--transicao);
+}
+
+.botao--primario {
+  background: var(--cor-primaria);
+  color: #fff;
+  box-shadow: var(--sombra-1);
+}
+
+.botao--primario:hover {
+  background: var(--cor-primaria-escura);
+  box-shadow: var(--sombra-hover);
+}
+
+.botao--primario:active {
+  transform: translateY(1px);
+}
+
+.botao--primario:disabled {
+  background: #9db8e8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.botao--texto {
+  background: transparent;
+  color: var(--cor-primaria);
+  padding: 8px 14px;
+}
+
+.botao--texto:hover:not(:disabled) {
+  background: rgba(26, 115, 232, 0.08);
+}
+
+.botao--texto:disabled {
+  color: var(--cor-texto-secundario);
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Loading
+   ========================================================================== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+  color: var(--cor-texto-secundario);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid rgba(26, 115, 232, 0.2);
+  border-top-color: var(--cor-primaria);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Banners (erro / aviso)
+   ========================================================================== */
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--raio-pequeno);
+  font-size: 0.9rem;
+}
+
+.banner p {
+  margin: 0;
+}
+
+.banner--erro {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro);
+}
+
+.banner--aviso {
+  background: var(--cor-aviso-fundo);
+  color: var(--cor-aviso-texto);
+}
+
+/* ==========================================================================
+   Resultados
+   ========================================================================== */
+.resumo-resultados {
+  color: var(--cor-texto-secundario);
+  font-size: 0.9rem;
+  margin: 0 0 12px 4px;
+}
+
+.resultados {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.licitacao-card {
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-1);
+  padding: 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow var(--transicao), transform var(--transicao);
+}
+
+.licitacao-card:hover,
+.licitacao-card:focus-visible {
+  box-shadow: var(--sombra-hover);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.licitacao-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.licitacao-card__titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.licitacao-card__orgao {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--cor-texto);
+}
+
+.licitacao-card__local {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--cor-texto-secundario);
+}
+
+.licitacao-card__objeto {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--cor-texto-secundario);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.licitacao-card__footer {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.chip--modalidade {
+  background: rgba(26, 115, 232, 0.1);
+  color: var(--cor-primaria-escura);
+}
+
+.chip--data {
+  background: #eceff3;
+  color: var(--cor-texto-secundario);
+}
+
+.chip--palavra {
+  background: rgba(30, 142, 62, 0.1);
+  color: var(--cor-sucesso);
+}
+
+.sem-resultados {
+  text-align: center;
+  color: var(--cor-texto-secundario);
+  padding: 40px 0;
+}
+
+/* ==========================================================================
+   Paginação
+   ========================================================================== */
+.paginacao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+}
+
+.paginacao__pagina {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--cor-texto);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background var(--transicao);
+}
+
+.paginacao__pagina:hover:not(:disabled) {
+  background: rgba(26, 115, 232, 0.08);
+}
+
+.paginacao__pagina--ativa {
+  background: var(--cor-primaria);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Responsividade
+   ========================================================================== */
+@media (max-width: 600px) {
+  .app-bar__title {
+    font-size: 1.05rem;
+  }
+
+  .filtros__acoes {
+    justify-content: stretch;
+  }
+
+  .botao--primario {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .resultados {
+    grid-template-columns: 1fr;
+  }
+}

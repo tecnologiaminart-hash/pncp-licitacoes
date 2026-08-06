@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Busca de Licitações — PNCP</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-bar">
+    <div class="app-bar__content">
+      <span class="app-bar__logo" aria-hidden="true">📄</span>
+      <h1 class="app-bar__title">Busca de Licitações — PNCP</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Painel de filtros -->
+    <section class="card filtros" aria-label="Filtros de busca">
+      <div class="filtros__grid">
+        <div class="campo">
+          <label for="uf">Estado (UF)</label>
+          <select id="uf" name="uf">
+            <option value="">Todos os estados</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="dataInicial">Data inicial</label>
+          <input type="date" id="dataInicial" name="dataInicial" />
+        </div>
+
+        <div class="campo">
+          <label for="dataFinal">Data final</label>
+          <input type="date" id="dataFinal" name="dataFinal" />
+        </div>
+      </div>
+
+      <fieldset class="palavras-chave">
+        <legend>Palavras-chave</legend>
+        <div id="listaPalavrasChave" class="palavras-chave__lista">
+          <!-- Checkboxes preenchidos dinamicamente via js/keywords.js -->
+        </div>
+      </fieldset>
+
+      <div class="filtros__acoes">
+        <span id="mensagemValidacao" class="mensagem-validacao" role="alert"></span>
+        <button id="btnPesquisar" class="botao botao--primario" type="button">
+          <span class="botao__icone" aria-hidden="true">🔍</span>
+          Pesquisar
+        </button>
+      </div>
+    </section>
+
+    <!-- Estado de carregamento -->
+    <div id="loading" class="loading" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Consultando o PNCP, aguarde...</p>
+    </div>
+
+    <!-- Estado de erro -->
+    <div id="erro" class="banner banner--erro" role="alert" hidden>
+      <span aria-hidden="true">⚠️</span>
+      <p id="erroMensagem"></p>
+    </div>
+
+    <!-- Aviso parcial (algumas palavras-chave falharam mas há resultados) -->
+    <div id="avisoParcial" class="banner banner--aviso" role="status" hidden>
+      <span aria-hidden="true">ℹ️</span>
+      <p id="avisoParcialMensagem"></p>
+    </div>
+
+    <!-- Resumo + resultados -->
+    <section aria-label="Resultados da busca">
+      <p id="resumoResultados" class="resumo-resultados" hidden></p>
+      <div id="resultados" class="resultados"></div>
+      <p id="semResultados" class="sem-resultados" hidden>Nenhuma licitação encontrada para os filtros selecionados.</p>
+    </section>
+
+    <!-- Paginação -->
+    <nav id="paginacao" class="paginacao" aria-label="Paginação de resultados" hidden></nav>
+  </main>
+
+  <template id="templateCardLicitacao">
+    <article class="licitacao-card" tabindex="0" role="link">
+      <header class="licitacao-card__header">
+        <h2 class="licitacao-card__titulo"></h2>
+        <span class="chip chip--modalidade"></span>
+      </header>
+      <p class="licitacao-card__orgao"></p>
+      <p class="licitacao-card__local"></p>
+      <p class="licitacao-card__objeto"></p>
+      <footer class="licitacao-card__footer">
+        <span class="chip chip--data"></span>
+        <span class="chip chip--palavra"></span>
+      </footer>
+    </article>
+  </template>
+
+  <script src="js/keywords.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
