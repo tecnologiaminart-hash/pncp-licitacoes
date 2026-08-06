@@ -169,7 +169,7 @@ const Ui = (() => {
 
     fragmento.querySelector('.licitacao-card__titulo').textContent = licitacao.titulo;
     fragmento.querySelector('.chip--modalidade').textContent = licitacao.modalidade;
-    fragmento.querySelector('.licitacao-card__orgao').textContent = licitacao.orgao;
+    fragmento.querySelector('.licitacao-card__orgao-valor').textContent = licitacao.orgao;
     fragmento.querySelector('.licitacao-card__local').textContent =
       `${licitacao.municipio || 'Município não informado'} — ${licitacao.uf || 'UF não informada'}`;
     fragmento.querySelector('.licitacao-card__objeto').textContent = licitacao.objetoResumido;

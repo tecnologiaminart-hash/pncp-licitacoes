@@ -391,8 +391,17 @@ body {
 .licitacao-card__orgao {
   margin: 0;
   font-size: 0.88rem;
-  font-weight: 500;
   color: var(--cor-texto);
+}
+
+.licitacao-card__orgao-rotulo {
+  font-weight: 700;
+  color: var(--cor-texto-secundario);
+  margin-right: 4px;
+}
+
+.licitacao-card__orgao-valor {
+  font-weight: 500;
 }
 
 .licitacao-card__local {

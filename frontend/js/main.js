@@ -82,6 +82,8 @@
         adicionarNovaPalavraChaveDoInput();
       }
     });
+
+    executarBusca(1); // busca automaticamente com os filtros padrão assim que a página abre
   }
 
   document.addEventListener('DOMContentLoaded', inicializar);
