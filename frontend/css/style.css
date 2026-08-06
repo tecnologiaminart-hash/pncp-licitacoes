@@ -29,6 +29,15 @@
   box-sizing: border-box;
 }
 
+/* Várias classes abaixo (.loading, .banner, .paginacao, .modal-overlay, .tela-login,
+   .app-shell...) definem `display: flex` para seu layout normal. Sem esta regra, essas
+   classes — tendo a mesma especificidade do atributo [hidden] — venceriam a regra padrão
+   do navegador que esconde elementos com [hidden], fazendo o JS ligar/desligar `.hidden`
+   sem nenhum efeito visual. Esta regra garante que [hidden] sempre vence. */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
@@ -47,6 +56,7 @@ body {
   justify-content: center;
   padding: 20px;
 }
+
 
 .login-card {
   width: 100%;
