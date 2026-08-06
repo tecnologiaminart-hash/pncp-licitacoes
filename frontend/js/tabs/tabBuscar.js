@@ -7,6 +7,7 @@ const TabBuscar = (() => {
 
   const TAMANHO_PAGINA = 12;
   let jaInicializado = false;
+  let resumoAtual = null; // { totalRegistros, pagina, totalPaginas } da última busca, mantido em dia conforme cards somem
 
   function montarFiltros(pagina) {
     return {
@@ -32,11 +33,19 @@ const TabBuscar = (() => {
     return '';
   }
 
-  /** Remove o card da tela após uma ação bem-sucedida (⭐/❌/📄). */
+  /**
+   * Remove o card da tela após uma ação bem-sucedida (⭐/❌/📄) e ajusta o contador de
+   * resultados — sem isso, o texto "X licitação(ões) encontrada(s)" ficava parado no
+   * número da busca original mesmo com cards sumindo da tela.
+   */
   function removerCard(elCard) {
     elCard.remove();
     if (Ui.elResultados.children.length === 0) {
       Ui.elSemResultados.hidden = false;
+    }
+    if (resumoAtual) {
+      resumoAtual.totalRegistros = Math.max(0, resumoAtual.totalRegistros - 1);
+      Ui.renderizarResumo(resumoAtual);
     }
   }
 
@@ -124,7 +133,8 @@ const TabBuscar = (() => {
     try {
       const resposta = await PncpLicitacoesService.buscarLicitacoes(filtros);
       await renderizarResultados(resposta.resultados);
-      Ui.renderizarResumo(resposta);
+      resumoAtual = { totalRegistros: resposta.totalRegistros, pagina: resposta.pagina, totalPaginas: resposta.totalPaginas };
+      Ui.renderizarResumo(resumoAtual);
       Ui.renderizarPaginacao(resposta, executarBusca);
       if (resposta.keywordsComErro.length > 0) Ui.mostrarAvisoParcial(resposta.keywordsComErro);
     } catch (erro) {
