@@ -60,11 +60,11 @@ body {
 
 .login-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 48px 40px;
+  gap: 20px;
+  padding: 64px 56px;
   border-radius: 4px;
   border: 1px solid var(--cor-borda);
   box-shadow: none;
@@ -77,23 +77,24 @@ body {
 }
 
 .login-card .campo input {
+  padding: 12px 14px;
   border-radius: 3px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .login-card__botao {
   width: 100%;
   justify-content: center;
-  padding: 11px;
+  padding: 13px;
   border-radius: 3px;
-  font-size: 14px;
+  font-size: 15px;
   margin-top: 8px;
 }
 
 .login-card__logo {
   display: block;
   width: 100%;
-  max-width: 220px;
+  max-width: 260px;
   height: auto;
   margin: 0 auto 32px;
 }
