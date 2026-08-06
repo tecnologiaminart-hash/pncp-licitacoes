@@ -4,6 +4,7 @@ const { buscarPorPalavraChave } = require('./pncpClient');
 const { normalizarLicitacao } = require('../utils/normalize');
 const { cache, montarChaveCache } = require('../utils/cache');
 const { contemTexto } = require('../utils/texto');
+const { agoraNoBrasil, classificarSituacao } = require('../utils/situacao');
 const { pncpMaxPaginasPorPalavra, pncpTamanhoPaginaUpstream } = require('../config/env');
 
 /**
@@ -62,6 +63,23 @@ function ordenarLicitacoes(licitacoes, ordenacao) {
   return [...licitacoes].sort(comparador);
 }
 
+/**
+ * Calcula a situação ("aberta", "encerra_hoje", "encerrada") de cada licitação em
+ * relação ao momento atual e, se algum filtro de situação foi selecionado, remove
+ * as que não se encaixam. Feito fora do cache (junto da ordenação) porque a situação
+ * depende do instante em que a busca é feita, não apenas dos dados do PNCP.
+ */
+function classificarEFiltrarPorSituacao(licitacoes, situacoesSelecionadas) {
+  const agoraStr = agoraNoBrasil();
+  const comSituacao = licitacoes.map((licitacao) => ({
+    ...licitacao,
+    situacao: classificarSituacao(licitacao.dataFimVigencia, agoraStr),
+  }));
+
+  if (situacoesSelecionadas.length === 0) return comSituacao;
+  return comSituacao.filter((licitacao) => situacoesSelecionadas.includes(licitacao.situacao));
+}
+
 /** Remove licitações duplicadas (mesma licitação encontrada por palavras-chave diferentes). */
 function removerDuplicadas(licitacoes) {
   const vistos = new Set();
@@ -118,7 +136,8 @@ async function obterConjuntoFiltrado(filtros) {
  */
 async function buscarLicitacoes(filtros) {
   const { licitacoes, keywordsComErro } = await obterConjuntoFiltrado(filtros);
-  const ordenadas = ordenarLicitacoes(licitacoes, filtros.ordenacao);
+  const comSituacao = classificarEFiltrarPorSituacao(licitacoes, filtros.situacoes);
+  const ordenadas = ordenarLicitacoes(comSituacao, filtros.ordenacao);
 
   const totalRegistros = ordenadas.length;
   const totalPaginas = Math.max(1, Math.ceil(totalRegistros / filtros.tamanhoPagina));

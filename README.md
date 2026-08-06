@@ -113,6 +113,7 @@ GET /api/licitacoes
 | `modalidade`     | não         | Uma das modalidades da tabela de domínio do PNCP (ex.: `Pregão - Eletrônico`) |
 | `orgao`          | não         | Busca parcial e tolerante a acentos no nome do órgão (ex.: `saude` encontra "SAÚDE") |
 | `ordenacao`      | não         | `data_desc` (padrão), `data_asc`, `titulo_asc`, `titulo_desc`, `orgao_asc`, `orgao_desc` |
+| `situacoes`      | não         | Lista separada por vírgula com `aberta`, `encerra_hoje` e/ou `encerrada`. Vazio/omitido = sem filtro |
 | `dataInicial`    | não         | `AAAA-MM-DD`                                              |
 | `dataFinal`      | não         | `AAAA-MM-DD`                                               |
 | `pagina`         | não         | Padrão `1`                                                 |
@@ -134,6 +135,8 @@ Exemplo de resposta:
       "uf": "CE",
       "municipio": "Itapiúna",
       "dataPublicacao": "2026-07-31T08:13:30.128413",
+      "dataFimVigencia": "2026-08-20T08:00",
+      "situacao": "aberta",
       "modalidade": "Pregão - Eletrônico",
       "objetoResumido": "AQUISIÇÃO DE MOBILIÁRIO ESCOLAR (MESAS E CADEIRAS) PARA...",
       "palavraChave": "Mesas",
@@ -147,10 +150,19 @@ Exemplo de resposta:
 `keywordsComErro` lista as palavras-chave cuja consulta ao PNCP falhou (timeout,
 instabilidade etc.), permitindo exibir os demais resultados normalmente com um aviso.
 
+`situacao` é calculada a cada requisição (não fica congelada no cache) a partir de
+`dataFimVigencia`, comparando com o horário atual no fuso de Brasília:
+`aberta` (ainda falta mais de um dia), `encerra_hoje` (fecha ainda hoje) ou
+`encerrada` (prazo já passou). Licitações sem essa data não são classificadas e só
+aparecem quando nenhum filtro de situação está selecionado.
+
 ## Funcionalidades do frontend
 
 - Filtro por Estado (UF), Modalidade da contratação, Órgão (busca parcial) e
   por período (data inicial/final).
+- Filtro por Situação da licitação: **Aberta para propostas** e **Encerra hoje**
+  (ambas marcadas por padrão) e **Encerrada** (desmarcada por padrão). Cada card
+  também exibe um selo colorido com a situação calculada.
 - Ordenação dos resultados (mais recentes/antigas primeiro, título A-Z/Z-A,
   órgão A-Z/Z-A).
 - Lista de palavras-chave pré-selecionadas em checkbox, todas marcadas por padrão.

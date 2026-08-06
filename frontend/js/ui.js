@@ -7,6 +7,7 @@ const Ui = (() => {
   const elModalidade = document.getElementById('modalidade');
   const elOrgao = document.getElementById('orgao');
   const elOrdenacao = document.getElementById('ordenacao');
+  const elListaSituacoes = document.getElementById('listaSituacoes');
   const elListaPalavras = document.getElementById('listaPalavrasChave');
   const elNovaPalavraChave = document.getElementById('novaPalavraChave');
   const elBtnAdicionarPalavraChave = document.getElementById('btnAdicionarPalavraChave');
@@ -50,6 +51,28 @@ const Ui = (() => {
       option.textContent = label;
       elOrdenacao.appendChild(option);
     });
+  }
+
+  function preencherSituacoes() {
+    SITUACOES.forEach(({ value, padraoMarcada }) => {
+      const label = document.createElement('label');
+      label.className = 'checkbox-palavra';
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.value = value;
+      input.checked = padraoMarcada;
+
+      const span = document.createElement('span');
+      span.textContent = SITUACAO_INFO[value].label;
+
+      label.append(input, span);
+      elListaSituacoes.appendChild(label);
+    });
+  }
+
+  function obterSituacoesSelecionadas() {
+    return Array.from(elListaSituacoes.querySelectorAll('input:checked')).map((input) => input.value);
   }
 
   /** Verifica (sem diferenciar maiúsc./minúsc.) se a palavra já está na lista atual. */
@@ -153,6 +176,15 @@ const Ui = (() => {
     fragmento.querySelector('.chip--data').textContent = formatarData(licitacao.dataPublicacao);
     fragmento.querySelector('.chip--palavra').textContent = `#${licitacao.palavraChave}`;
 
+    const infoSituacao = SITUACAO_INFO[licitacao.situacao];
+    const chipSituacao = fragmento.querySelector('.chip--situacao');
+    if (infoSituacao) {
+      chipSituacao.textContent = infoSituacao.label;
+      chipSituacao.classList.add(infoSituacao.classe);
+    } else {
+      chipSituacao.textContent = 'Situação não informada';
+    }
+
     const abrirLink = () => window.open(licitacao.linkPncp, '_blank', 'noopener,noreferrer');
     artigo.addEventListener('click', abrirLink);
     artigo.addEventListener('keydown', (evento) => {
@@ -232,6 +264,8 @@ const Ui = (() => {
     preencherUfs,
     preencherModalidades,
     preencherOrdenacao,
+    preencherSituacoes,
+    obterSituacoesSelecionadas,
     preencherPalavrasChave,
     adicionarPalavraChave,
     obterPalavrasChaveSelecionadas,

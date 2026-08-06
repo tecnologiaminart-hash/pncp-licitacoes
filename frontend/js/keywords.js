@@ -33,6 +33,21 @@ const OPCOES_ORDENACAO = [
   { value: 'orgao_desc', label: 'Órgão (Z-A)' },
 ];
 
+// Situações possíveis de uma licitação (calculadas pelo backend a partir da data de
+// fim de recebimento de propostas). "aberta" e "encerra_hoje" já vêm marcadas por padrão.
+const SITUACOES = [
+  { value: 'aberta', padraoMarcada: true },
+  { value: 'encerra_hoje', padraoMarcada: true },
+  { value: 'encerrada', padraoMarcada: false },
+];
+
+// Rótulo em português e classe CSS do chip exibido em cada card, por situação.
+const SITUACAO_INFO = {
+  aberta: { label: 'Aberta para propostas', classe: 'chip--situacao-aberta' },
+  encerra_hoje: { label: 'Encerra hoje', classe: 'chip--situacao-encerra-hoje' },
+  encerrada: { label: 'Encerrada', classe: 'chip--situacao-encerrada' },
+};
+
 // Sugestões iniciais; o usuário pode remover qualquer uma e adicionar termos próprios.
 const PALAVRAS_CHAVE_PADRAO = [
   'Mobiliário',

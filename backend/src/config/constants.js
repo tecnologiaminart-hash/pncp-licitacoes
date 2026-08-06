@@ -45,9 +45,14 @@ const OPCOES_ORDENACAO = [
   'orgao_desc',
 ];
 
+// Situações possíveis de uma licitação quanto ao recebimento de propostas,
+// calculadas em src/utils/situacao.js a partir da data de fim de vigência.
+const SITUACOES_VALIDAS = ['aberta', 'encerra_hoje', 'encerrada'];
+
 module.exports = {
   UFS_VALIDAS,
   PALAVRAS_CHAVE_PADRAO,
   MODALIDADES_CONTRATACAO,
   OPCOES_ORDENACAO,
+  SITUACOES_VALIDAS,
 };

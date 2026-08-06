@@ -56,6 +56,13 @@
       </div>
 
       <fieldset class="palavras-chave">
+        <legend>Situação</legend>
+        <div id="listaSituacoes" class="palavras-chave__lista">
+          <!-- Checkboxes preenchidos dinamicamente via js/keywords.js -->
+        </div>
+      </fieldset>
+
+      <fieldset class="palavras-chave">
         <legend>Palavras-chave</legend>
         <div id="listaPalavrasChave" class="palavras-chave__lista">
           <!-- Chips preenchidos dinamicamente via js/keywords.js -->
@@ -119,6 +126,7 @@
       <p class="licitacao-card__local"></p>
       <p class="licitacao-card__objeto"></p>
       <footer class="licitacao-card__footer">
+        <span class="chip chip--situacao"></span>
         <span class="chip chip--data"></span>
         <span class="chip chip--palavra"></span>
       </footer>

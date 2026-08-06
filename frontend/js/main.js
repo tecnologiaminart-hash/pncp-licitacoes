@@ -13,6 +13,7 @@
       modalidade: Ui.elModalidade.value,
       orgao: Ui.elOrgao.value.trim(),
       ordenacao: Ui.elOrdenacao.value,
+      situacoes: Ui.obterSituacoesSelecionadas(),
       dataInicial: elDataInicial.value,
       dataFinal: elDataFinal.value,
       palavrasChave: Ui.obterPalavrasChaveSelecionadas(),
@@ -69,6 +70,7 @@
     Ui.preencherUfs();
     Ui.preencherModalidades();
     Ui.preencherOrdenacao();
+    Ui.preencherSituacoes();
     Ui.preencherPalavrasChave();
 
     elBtnPesquisar.addEventListener('click', () => executarBusca(1));

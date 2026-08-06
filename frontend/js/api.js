@@ -5,7 +5,7 @@ const ApiLicitacoes = (() => {
   const BASE_URL = '/api/licitacoes';
 
   /**
-   * @param {object} filtros { uf, modalidade, orgao, ordenacao, dataInicial, dataFinal, palavrasChave, pagina, tamanhoPagina }
+   * @param {object} filtros { uf, modalidade, orgao, ordenacao, situacoes, dataInicial, dataFinal, palavrasChave, pagina, tamanhoPagina }
    * @returns {Promise<object>} resposta já em JSON
    */
   async function buscar(filtros) {
@@ -14,6 +14,7 @@ const ApiLicitacoes = (() => {
     if (filtros.modalidade) params.set('modalidade', filtros.modalidade);
     if (filtros.orgao) params.set('orgao', filtros.orgao);
     if (filtros.ordenacao) params.set('ordenacao', filtros.ordenacao);
+    if (filtros.situacoes && filtros.situacoes.length > 0) params.set('situacoes', filtros.situacoes.join(','));
     if (filtros.dataInicial) params.set('dataInicial', filtros.dataInicial);
     if (filtros.dataFinal) params.set('dataFinal', filtros.dataFinal);
     params.set('palavrasChave', filtros.palavrasChave.join(','));

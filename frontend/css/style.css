@@ -443,6 +443,21 @@ body {
   color: var(--cor-sucesso);
 }
 
+.chip--situacao-aberta {
+  background: rgba(30, 142, 62, 0.12);
+  color: var(--cor-sucesso);
+}
+
+.chip--situacao-encerra-hoje {
+  background: var(--cor-aviso-fundo);
+  color: var(--cor-aviso-texto);
+}
+
+.chip--situacao-encerrada {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro);
+}
+
 .sem-resultados {
   text-align: center;
   color: var(--cor-texto-secundario);

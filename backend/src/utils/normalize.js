@@ -32,6 +32,7 @@ function normalizarLicitacao(itemPncp, palavraChave) {
     uf: itemPncp.uf || '',
     municipio: itemPncp.municipio_nome || 'Não informado',
     dataPublicacao: itemPncp.data_publicacao_pncp || null,
+    dataFimVigencia: itemPncp.data_fim_vigencia || null,
     modalidade: itemPncp.modalidade_licitacao_nome || 'Não informada',
     objetoResumido: itemPncp.description || 'Objeto não informado',
     palavraChave,

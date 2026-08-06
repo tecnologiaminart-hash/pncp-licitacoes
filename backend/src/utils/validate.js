@@ -1,6 +1,11 @@
 // Validação e normalização dos parâmetros recebidos pelo endpoint /api/licitacoes.
 // Mantém a rota/controller enxutos e centraliza as regras de entrada em um só lugar.
-const { UFS_VALIDAS, MODALIDADES_CONTRATACAO, OPCOES_ORDENACAO } = require('../config/constants');
+const {
+  UFS_VALIDAS,
+  MODALIDADES_CONTRATACAO,
+  OPCOES_ORDENACAO,
+  SITUACOES_VALIDAS,
+} = require('../config/constants');
 
 const REGEX_DATA = /^\d{4}-\d{2}-\d{2}$/;
 const TAMANHO_MAX_PALAVRA_CHAVE = 80;
@@ -49,6 +54,16 @@ function validarFiltrosBusca(query) {
     throw new ErroValidacao(`Ordenação inválida: ${ordenacao}.`);
   }
 
+  // Situação (aberta/encerra hoje/encerrada): lista vazia = sem filtro (mostra todas).
+  const situacoesBrutas = query.situacoes
+    ? String(query.situacoes).split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const situacoesInvalidas = situacoesBrutas.filter((s) => !SITUACOES_VALIDAS.includes(s));
+  if (situacoesInvalidas.length > 0) {
+    throw new ErroValidacao(`Situação inválida: ${situacoesInvalidas.join(', ')}.`);
+  }
+  const situacoes = [...new Set(situacoesBrutas)];
+
   const dataInicial = validarData(query.dataInicial, 'dataInicial');
   const dataFinal = validarData(query.dataFinal, 'dataFinal');
   if (dataInicial && dataFinal && dataInicial > dataFinal) {
@@ -83,7 +98,7 @@ function validarFiltrosBusca(query) {
   const pagina = Math.max(1, Number(query.pagina) || 1);
   const tamanhoPagina = Math.min(50, Math.max(1, Number(query.tamanhoPagina) || 12));
 
-  return { uf, modalidade, orgao, ordenacao, dataInicial, dataFinal, palavrasChave, pagina, tamanhoPagina };
+  return { uf, modalidade, orgao, ordenacao, situacoes, dataInicial, dataFinal, palavrasChave, pagina, tamanhoPagina };
 }
 
 module.exports = { validarFiltrosBusca, ErroValidacao };
